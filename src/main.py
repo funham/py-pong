@@ -54,5 +54,15 @@ while True:
     ball_group.draw(scr)
     rack_group.draw(scr)
 
+    pg.draw.rect(scr, (250,250,250), (cfg.SCR_SIZE.x/2-9,cfg.SCR_SIZE.y/2-9,18,18),2)
+    dot = 0
+    for i in range(10):
+        pg.draw.line(scr, (250,250,250), (cfg.SCR_SIZE.x/2-1,dot), (cfg.SCR_SIZE.x/2-1,dot+10), 2)
+        dot = dot + 20
+    dot += 10
+    for i in range(10):
+        pg.draw.line(scr, (250,250,250), (cfg.SCR_SIZE.x/2-1,dot), (cfg.SCR_SIZE.x/2-1,dot+10), 2)
+        dot = dot + 20
+
     # putting image on the screen
     pg.display.update()
