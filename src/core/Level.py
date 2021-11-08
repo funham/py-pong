@@ -9,5 +9,4 @@ class Level:
         self.field = field
 
 
-lvl = Level(field=vec2(30, 15),
-            origin=cfg.SCR_CENTER, scale=cfg.SCR_SIZE.y/30)
+lvl = Level(field=vec2(30, 15), origin=cfg.SCR_CENTER, scale=cfg.SCR_SIZE.y/30)

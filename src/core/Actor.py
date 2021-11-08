@@ -29,8 +29,7 @@ class Actor(pg.sprite.Sprite):
         self.pos += self.vel * dt
         self.rect.center = self.pos * self.level.scale + self.level.origin
         self.rect.size = self.size * self.level.scale
-        self.image = pg.transform.scale(
-            self.image, self.size * self.level.scale)
+        self.image = pg.transform.scale(self.image, self.size * self.level.scale)
 
     def update(self, dt) -> None:
         return super().update()

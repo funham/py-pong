@@ -2,25 +2,26 @@ import sys  # for sys.exit() at the end
 from core.core import *
 from modes.RackBase import *
 from modes.MClassic import *
+import core.Actor
 
 import core.cfg as cfg
 from modes.utils import sign
 
 pg.init()
 pg.display.set_caption('PongZ')
-pg.display.set_icon(pg.image.load('../Assets/pong.png'))
+pg.display.set_icon(pg.image.load('Assets\pong.png'))
 
 scr = pg.display.set_mode(cfg.SCR_SIZE)
 clock = pg.time.Clock()
 
 ball_group = pg.sprite.Group()
-ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(7, 5))
+ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(2, 1))
 ball_group.add(ball)
 
 rack1 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
                       ball=ball, max_vel=20, difficulty=1)
-rack2 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
-                      ball=ball, max_vel=20, difficulty=1)
+rack2 = RackClassic(level=lvl, pos=vec2(lvl.field.x - 2, 0),
+                      ball=ball, max_vel=5)
 
 rack_group = pg.sprite.Group()
 
@@ -33,7 +34,7 @@ rt = 0  # run time value
 while True:
 
     # time passed since last frame
-    dt = clock.tick(60) / 100
+    dt = clock.tick(1000) / 100
     rt += dt
 
     # checking for events

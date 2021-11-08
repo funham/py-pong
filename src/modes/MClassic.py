@@ -13,6 +13,8 @@ class RackClassic(RackBase):
         if self.rect.colliderect(self.ball.rect):
             self.ball.vel.x *= -1
 
+        self.handle_input(self.max_vel)
+
         super().update(dt)
         super().check_bounds()
 
