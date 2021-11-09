@@ -9,13 +9,13 @@ from modes.utils import sign
 
 pg.init()
 pg.display.set_caption('PongZ')
-pg.display.set_icon(pg.image.load('Assets\pong.png'))
+pg.display.set_icon(pg.image.load('../Assets/pong.png'))
 
 scr = pg.display.set_mode(cfg.SCR_SIZE)
 clock = pg.time.Clock()
 
 ball_group = pg.sprite.Group()
-ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(2, 1))
+ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(5, 3))
 ball_group.add(ball)
 
 rack1 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
