@@ -1,3 +1,4 @@
+from core.cfg import SCR_SIZE
 from core.core import *
 
 
@@ -6,6 +7,7 @@ class BallBase(Actor):
         super().__init__(level=level,  # sprite_path='../Assets/ball.png',
                          size=vec2(1, 1), vel=vel, pos=pos)
         self.np = self.pos
+        self.goal_can_happen = True
 
     def reflect(self):
         np = self.pos.y  # position
@@ -22,6 +24,18 @@ class BallBase(Actor):
         if db <= 0:
             self.vel.y *= -1
             self.pos.y -= 2 * db
+
+    def goal(self):
+        if self.goal_can_happen and self.pos.x <= -self.level.field.x:
+            print('goal1')
+            self.goal_can_happen = False
+
+        if self.goal_can_happen and self.pos.x >= self.level.field.x:
+            print('goal2')
+            self.goal_can_happen = False
+
+        if not self.goal_can_happen and self.pos.x > -self.level.field.x and self.pos.x < self.level.field.x:
+            self.goal_can_happen = True
 
     def update(self, dt) -> None:
         super().apply_phys(dt)

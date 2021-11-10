@@ -15,7 +15,7 @@ scr = pg.display.set_mode(cfg.SCR_SIZE)
 clock = pg.time.Clock()
 
 ball_group = pg.sprite.Group()
-ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(5, 3))
+ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(1, 0.5))
 ball_group.add(ball)
 
 rack1 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
