@@ -68,11 +68,16 @@ class RackBase(Actor):
 
     def handle_input(self, force):
         self.key_pressed = pygame.key.get_pressed()
-        if self.key_pressed[pygame.K_UP]:
-            self.vel.y = -force
-        elif self.key_pressed[pygame.K_DOWN]:
-            self.vel.y = force
-        else: self.vel.y = 0
+        if self.pos.x > 0:
+            if self.key_pressed[pygame.K_UP]     :self.vel.y = -force
+            elif self.key_pressed[pygame.K_DOWN] :self.vel.y = force
+            else                                 :self.vel.y = 0
+        
+        if self.pos.x < 0:
+            if self.key_pressed[pygame.K_w]     :self.vel.y = -force
+            elif self.key_pressed[pygame.K_s] :self.vel.y = force
+            else                                 :self.vel.y = 0
+
 
     # inherited sprite function
     # called automatically before drawing
