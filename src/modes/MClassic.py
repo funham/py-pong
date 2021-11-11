@@ -36,5 +36,5 @@ class BallClassic(BallBase):
     def update(self, dt) -> None:
         super().update(dt)
         super().reflect()
-        super().goal()
+        super().check_goal()
 

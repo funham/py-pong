@@ -2,6 +2,7 @@ import sys  # for sys.exit() at the end
 from core.core import *
 from modes.RackBase import *
 from modes.MClassic import *
+from modes.VisualEnvironment import *
 import core.Actor
 
 import core.cfg as cfg
@@ -28,13 +29,17 @@ rack_group = pg.sprite.Group()
 rack_group.add(rack1)
 rack_group.add(rack2)
 
+visual_group = pg.sprite.Group()
+background = BackGround(scr, ball.players_goals)
+visual_group.add(background)
+
 bg_brightness = cfg.BG_DEFAULT_BRIGHTNESS  # 0 - 255
 rt = 0  # run time value
 
 while True:
 
     # time passed since last frame
-    dt = clock.tick(1000) / 100
+    dt = clock.tick(60) / 100
     rt += dt
 
     # checking for events
@@ -49,6 +54,7 @@ while True:
     # updating all sprite groups
     rack_group.update(dt)
     ball_group.update(dt)
+    background.update()
 
     # drawing all sprite groups
     ball_group.draw(scr)

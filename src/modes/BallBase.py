@@ -8,6 +8,7 @@ class BallBase(Actor):
                          size=vec2(1, 1), vel=vel, pos=pos)
         self.np = self.pos
         self.goal_can_happen = True
+        self.players_goals = [0,0]
 
     def reflect(self):
         np = self.pos.y  # position
@@ -25,13 +26,13 @@ class BallBase(Actor):
             self.vel.y *= -1
             self.pos.y -= 2 * db
 
-    def goal(self):
+    def check_goal(self):
         if self.goal_can_happen and self.pos.x <= -self.level.field.x:
-            print('goal1')
+            self.players_goals[1] += 1
             self.goal_can_happen = False
 
         if self.goal_can_happen and self.pos.x >= self.level.field.x:
-            print('goal2')
+            self.players_goals[0] += 1
             self.goal_can_happen = False
 
         if not self.goal_can_happen and self.pos.x > -self.level.field.x and self.pos.x < self.level.field.x:
