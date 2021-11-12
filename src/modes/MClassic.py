@@ -14,7 +14,7 @@ class RackClassic(RackBase):
             self.ball.vel.x *= -1
 
         super().update(dt)
-        super().check_bounds()
+        super().constrain(dt)
 
 
 class RackClassicAI(RackBaseAI):
@@ -22,9 +22,9 @@ class RackClassicAI(RackBaseAI):
         super().__init__(level, pos, ball, max_vel, difficulty=difficulty)
 
     def update(self, dt) -> None:
-        super().follow_ball()
+        super().follow_ball(dt)
         super().update(dt)
-        super().check_bounds()
+        super().constrain(dt)
 
 
 class BallClassic(BallBase):
@@ -34,3 +34,6 @@ class BallClassic(BallBase):
     def update(self, dt) -> None:
         super().update(dt)
         super().reflect()
+
+    def kekw(self):
+        print('kekw')

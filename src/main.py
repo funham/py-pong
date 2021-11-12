@@ -1,4 +1,6 @@
-import sys  # for sys.exit() at the end
+import sys
+
+from pygame.constants import BLEND_RGB_ADD  # for sys.exit() at the end
 from core.core import *
 from modes.RackBase import *
 from modes.MClassic import *
@@ -13,16 +15,18 @@ pg.display.set_icon(pg.image.load('../Assets/pong.png'))
 scr = pg.display.set_mode(cfg.SCR_SIZE)
 clock = pg.time.Clock()
 
-ball_group = pg.sprite.Group()
-ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(7, 5))
-ball_group.add(ball)
+rack_group = pg.sprite.Group()
+ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(0, 2), rackets=rack_group)
 
 rack1 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
                       ball=ball, max_vel=20, difficulty=1)
 rack2 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
                       ball=ball, max_vel=20, difficulty=1)
 
-rack_group = pg.sprite.Group()
+
+ball_group = pg.sprite.Group()
+
+ball_group.add(ball)
 
 rack_group.add(rack1)
 rack_group.add(rack2)
@@ -46,8 +50,10 @@ while True:
     scr.fill(bg_brightness * pg.Vector3(1, 1, 1))
 
     # updating all sprite groups
-    rack_group.update(dt)
     ball_group.update(dt)
+    rack_group.update(dt)
+
+    balls = ball_group.sprites()
 
     # drawing all sprite groups
     ball_group.draw(scr)

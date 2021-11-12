@@ -1,11 +1,12 @@
 from core.core import *
+from core.Colliders import *
 
 
 class BallBase(Actor):
     def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0)):
         super().__init__(level=level,  # sprite_path='../Assets/ball.png',
-                         size=vec2(1, 1), vel=vel, pos=pos)
-        self.np = self.pos
+                         size=vec2(1, 1), vel=vel, pos=pos, rackets=None)
+        self.collider = RectCollider(vec2(1, 1), pos)
 
     def reflect(self):
         np = self.pos.y  # position
@@ -25,5 +26,3 @@ class BallBase(Actor):
 
     def update(self, dt) -> None:
         super().apply_phys(dt)
-        nv = self.vel + self.acc * dt
-        self.np = self.pos + self.vel * dt

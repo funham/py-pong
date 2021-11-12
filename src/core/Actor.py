@@ -5,10 +5,11 @@ from .Level import *
 
 class Actor(pg.sprite.Sprite):
     def __init__(self, level: Level, sprite_path=None, size: vec2 = None, pos=vec2(0, 0),
-                 vel=vec2(0, 0), acc=vec2(0, 0)) -> None:
+                 vel=vec2(0, 0), acc=vec2(0, 0), collider=None) -> None:
         super().__init__()
         self.level = level
         self.size = size
+
         if sprite_path:
             self.image = pg.image.load(sprite_path)
         else:
@@ -23,6 +24,9 @@ class Actor(pg.sprite.Sprite):
         self.vel = vel
         self.pos = pos
         self.acc = acc
+
+        if collider:
+            self.collider = collider
 
     def apply_phys(self, dt):
         self.vel += self.acc * dt

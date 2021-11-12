@@ -17,9 +17,14 @@ class RackBase(Actor):
 
     # for some modes could be useful
     # should be added after apply_phys()
-    def check_bounds(self):
-
+    def constrain(self, dt):
         bounds = self.level.field
+
+        # bb = self.pos.y - self.size.y / 2
+        # tb = self.pos.y + self.size.y / 2
+
+        # dy = min(bounds.y - tb,
+        #          bounds.y + bb)
 
         # TODO cut the crap
         if self.pos.x - self.size.x / 2 <= -bounds.x:
@@ -33,6 +38,7 @@ class RackBase(Actor):
 
         if self.pos.y + self.size.y / 2 >= bounds.y:
             self.pos.y = bounds.y - self.size.y / 2
+            self.vel.y = 0
 
     def reflect_ball(self, dt):
 
@@ -46,23 +52,20 @@ class RackBase(Actor):
         self.ball.pos.x = self.ball.pos.x - 2 * dx
         self.ball.vel.x *= -1
 
-        # print(
-        #     f'bb={bb}, rb={rb}, dx={dx}, s={-2*dx*self.side}')
-        # print(f'next bb={ self.ball.pos.x + self.side * self.ball.size.x / 2}')
-
     def is_ball_behind(self):
 
         # calculate border function
-        def cb(pos, size, sign) -> vec2: return pos + sign * size / 2
+        # def cb(pos, size, sign) -> vec2: return pos + sign * size / 2
 
-        in_y = cb(self.ball.np, self.ball.size, 1).y <= cb(self.pos, self.size, 1).y and \
-            cb(self.ball.np, self.ball.size, -
-               1).y >= cb(self.pos, self.size, -1).y
+        # in_y = cb(self.ball.np, self.ball.size, 1).y <= cb(self.pos, self.size, 1).y and \
+        #     cb(self.ball.np, self.ball.size, -
+        #        1).y >= cb(self.pos, self.size, -1).y
 
-        in_x = self.ball.np.x * self.side >= self.pos.x * self.side
+        # in_x = self.ball.np.x * self.side >= self.pos.x * self.side
 
-        # TODO check with correct trajectory
-        return in_x and in_y
+        # # TODO check with correct trajectory
+        # return in_x and in_y
+        return False
 
     # inherited sprite function
     # called automatically before drawing
@@ -83,13 +86,18 @@ class RackBaseAI(RackBase):
         super().__init__(level, pos, ball, max_vel)
         self.difficulty = difficulty
 
-    def follow_ball(self):
+    def follow_ball(self, dt):
         dy = (self.ball.pos - self.pos).y
 
+        t_vel = 0
+
         if dy > self.size.y / 2:
-            self.vel.y = self.max_vel * ut.sign(dy)
+            t_vel = self.max_vel * ut.sign(dy)
         else:
-            self.vel.y = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+            t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+
+        self.vel.y = t_vel
+        # self.vel.y = ut.approach(self.vel.y, t_vel + ut.sign(dy), dt * 10000)
 
     def update(self, dt) -> None:
         super().update(dt)  # applies physics as well
