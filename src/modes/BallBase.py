@@ -24,5 +24,5 @@ class BallBase(Actor):
             self.vel.y *= -1
             self.pos.y -= 2 * db
 
-    def update(self, dt) -> None:
-        super().apply_phys(dt)
+    def update(self, dt, upd_t) -> None:
+        super().update(dt, upd_t=upd_t)

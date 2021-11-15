@@ -9,7 +9,8 @@ import copy
 class RackBase(Actor):
     def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float):
         super().__init__(level=level,  # sprite_path='../Assets/rack.png',
-                         size=vec2(1, 5), vel=vec2(0, 0), pos=pos)
+                         size=vec2(1, 5), vel=vec2(0, 0), pos=pos, 
+                         collider=RectCollider(size=vec2(1, 5), pos=pos))
         self.ball = ball
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)

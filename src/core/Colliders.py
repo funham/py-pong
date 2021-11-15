@@ -24,6 +24,12 @@ class SegCollider(Collider):
     def center(self):
         return (self.p1 + self.p2)/2
 
+    def p_list(self) -> tuple:
+        return (self.p1, self.p2)
+    
+    def get_points(self):
+        return self.p1, self.p2
+
     def inter_seg(self, other):
 
         def inter_with_vert(x0, min_y, max_y, seg):
@@ -65,7 +71,7 @@ class SegCollider(Collider):
 
         return vec2(x, y) if in_x and in_y else None
 
-
+# TODO delete and make EllipseCollider instead
 class CircleColiider(Collider):
     def __init__(self, size: float, pos: vec2) -> None:
         super().__init__(size, pos)
@@ -141,6 +147,15 @@ class RectCollider(Collider):
         return SegCollider(self.bottom_right(),
                            self.top_right())
 
+    def p_list(self) -> tuple:
+        t = []
+        t.append(self.top_left())
+        t.append(self.top_right())
+        t.append(self.bottom_left())
+        t.append(self.bottom_right())
+
+        return tuple(t)
+
     def collides_point(self, point: vec2) -> bool:
         in_x = point.x <= self.right.x and point.x >= self.left.x
         in_y = point.y <= self.top.y and point.y >= self.bottom.y
@@ -148,12 +163,9 @@ class RectCollider(Collider):
         return in_x and in_y
 
     def collides_rect(self, other) -> bool:
-        return \
-            self.collides_point(other.bottom_left()) or \
-            other.collides_point(self.bottom_left()) or \
-            self.collides_point(other.bottom_right()) or \
-            other.collides_point(self.bottom_right()) or \
-            self.collides_point(other.top_left()) or \
-            other.collides_point(self.top_left()) or \
-            self.collides_point(other.top_right()) or \
-            other.collides_point(self.top_right())
+        res = False
+
+        for p in self.p_list:  res &= other.collides_point(p)
+        for p in other.p_list: res &= self.collides_point(p)
+
+        return res
