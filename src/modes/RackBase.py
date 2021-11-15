@@ -23,7 +23,6 @@ class RackBase(Actor):
 
         bounds = self.level.field
 
-        # TODO cut the crap
         if self.pos.x - self.size.x / 2 <= -bounds.x:
             self.pos.x = -bounds.x + self.size.x / 2
 
@@ -66,17 +65,14 @@ class RackBase(Actor):
         # TODO check with correct trajectory
         return in_x and in_y
 
-    def handle_input(self, force):
-        self.key_pressed = pygame.key.get_pressed()
-        if self.pos.x > 0:
-            if self.key_pressed[pygame.K_UP]     :self.vel.y = -force
-            elif self.key_pressed[pygame.K_DOWN] :self.vel.y = force
-            else                                 :self.vel.y = 0
+    def handle_input(self, vel):
+        key_pressed = pygame.key.get_pressed()
+
+        UpDown_diff = (key_pressed[pygame.K_DOWN] - key_pressed[pygame.K_UP]) #difference between Up and Down 
+        WS_diff     = (key_pressed[pygame.K_s]    - key_pressed[pygame.K_w] ) #difference between W and S
         
-        if self.pos.x < 0:
-            if self.key_pressed[pygame.K_w]     :self.vel.y = -force
-            elif self.key_pressed[pygame.K_s] :self.vel.y = force
-            else                                 :self.vel.y = 0
+        if self.side > 0: self.vel.y = vel * UpDown_diff #left racket
+        if self.side < 0: self.vel.y = vel * WS_diff #right racket
 
 
     # inherited sprite function
