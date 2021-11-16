@@ -1,12 +1,13 @@
 from src.core.Colliders import *
 import matplotlib.pyplot as plt
 
+# (19.83, 0)  (19.32, 0)
+# (27.5, 2.5) (27.5, -2.5)
+x11, y11 = 19.83, 0
+x12, y12 = 19.32, 0
 
-x11, y11 = 0, 0
-x12, y12 = 0, 10
-
-x21, y21 = -10, 0
-x22, y22 = 10, 1
+x21, y21 = 27.5, 2.5
+x22, y22 = 27.5, -2.5
 
 s1 = SegCollider(vec2(x11, y11), vec2(x12, y12))
 s2 = SegCollider(vec2(x21, y21), vec2(x22, y22))

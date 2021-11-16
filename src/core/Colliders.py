@@ -41,7 +41,8 @@ class SegCollider(Collider):
 
             y = (x0 - seg.p1.x) * t2 + seg.p1.y
 
-            return vec2(x0, y) if min_y <= y <= max_y else None
+            return vec2(x0, y) if min_y <= y <= max_y and \
+                seg.min_x <= x0 <= seg.max_x else None
 
         if self.dx == 0:
             return inter_with_vert(self.p1.x, self.min_y, self.max_y, other)
@@ -117,18 +118,18 @@ class RectCollider(Collider):
     def center(self):
         return self.pos
 
-    def top_left(self):
+    def top_left(self, inv=1):
         return self.pos - self.size / 2
 
     def bottom_right(self):
         return self.pos + self.size / 2
 
-    def top_right(self):
+    def top_right(self, inv=1):
         x = self.pos.x + self.size.x / 2
         y = self.pos.y - self.size.y / 2
         return vec2(x, y)
 
-    def bottom_left(self):
+    def bottom_left(self, inv=1):
         x = self.pos.x - self.size.x / 2
         y = self.pos.y + self.size.y / 2
         return vec2(x, y)
@@ -137,13 +138,13 @@ class RectCollider(Collider):
         return SegCollider(self.bottom_left(),
                            self.bottom_right())
 
-    def top_seg(self):
-        return SegCollider(self.top_left(),
-                           self.top_right())
+    def top_seg(self, inv=1):
+        return SegCollider(self.top_left(inv),
+                           self.top_right(inv))
 
-    def left_seg(self):
-        return SegCollider(self.bottom_left(),
-                           self.top_left())
+    def left_seg(self, inv=1):
+        return SegCollider(self.bottom_left(inv),
+                           self.top_left(inv))
 
     def right_seg(self):
         return SegCollider(self.bottom_right(),

@@ -1,5 +1,6 @@
 from .BallBase import *
 from .import utils as ut
+import matplotlib.pyplot as plt
 
 import copy
 
@@ -43,10 +44,24 @@ class RackBase(Actor):
         self.ball.vel.x *= -1
 
     def is_ball_behind(self):
-        return False
+        trace = SegCollider(self.ball.pos, self.ball.prev)
+        print(f'{trace.p_list()=}')
 
-    def pre_phys(self, dt):
-        return super().pre_phys(dt)
+        hit_surf = self.collider.left_seg(inv=self.side)
+        print(f'{hit_surf.p_list()=}')
+        # plt.plot([trace.p1.x, trace.p2.x],
+        #          [trace.p1.y, trace.p2.y])
+        # plt.plot([hit_surf.p1.x, hit_surf.p2.x],
+        #          [hit_surf.p1.y, hit_surf.p2.y])
+
+        # plt.show()
+        if trace.inter_seg(hit_surf):
+            print('hoba')
+            #     return True
+
+            # else:
+            #     return False
+        # pass
 
     def post_phys(self, dt):
         if self.is_ball_behind() and not self.coll:
@@ -74,13 +89,12 @@ class RackBaseAI(RackBase):
 
         t_vel = 0
 
-        if dy > self.size.y / 2:
+        if abs(dy) > self.size.y / 2:
             t_vel = self.max_vel * ut.sign(dy)
         else:
             t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
 
         self.vel.y = t_vel
-        # self.vel.y = ut.approach(self.vel.y, t_vel + ut.sign(dy), dt * 10000)
 
     def update(self, dt, upd_t) -> None:
         super().update(dt, upd_t)  # applies physics as well
