@@ -31,16 +31,13 @@ class RackBase(Actor):
             self.pos.y = bounds.y - self.size.y / 2
             self.vel.y = 0
 
-    def reflect_ball(self, dt):
-
-        def cb(obj, sign) -> vec2: return obj.pos + sign * obj.size / 2
-
-        rb = cb(self, -self.side).x
-        bb = cb(self.ball, self.side).x
-
-        dx = bb - rb
-
-        self.ball.pos.x = self.ball.pos.x - 2 * dx
+    def reflect_ball(self, int_p):
+        '''
+        takes the point ball hit racket in (intersection point)
+        '''
+        # delta with current ball position and hit point
+        delta = vec2(self.ball.pos - int_p)
+        height = (int_p - self.pos).y  # will define reflected angle
         self.ball.vel.x *= -1
 
     def collides_ball(self):
@@ -49,15 +46,18 @@ class RackBase(Actor):
 
         return trace.inter_seg(hit_surf)
 
-    def post_phys(self, dt):
+    def pre_phys(self, dt):
         ball_hit = self.collides_ball()
 
         if ball_hit and not self.coll:
-            self.reflect_ball(dt)
+            self.reflect_ball(ball_hit)
             self.coll = True
         elif not ball_hit and self.coll:
             self.coll = False
 
+        return super().pre_phys(dt)
+
+    def post_phys(self, dt):
         self.constrain()
 
         return super().post_phys(dt)

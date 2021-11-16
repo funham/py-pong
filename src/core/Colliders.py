@@ -104,13 +104,13 @@ class RectCollider(Collider):
         super().__init__(size, pos)
 
     def left(self, inv=1):
-        return self.pos - vec2(inv * self.size.x/2, 0)
+        return self.pos - inv * vec2(self.size.x/2, 0)
 
     def right(self):
         return self.pos + vec2(self.size.x/2, 0)
 
     def top(self, inv=1):
-        return self.pos - vec2(0, inv * self.size.y/2)
+        return self.pos - inv * vec2(0, self.size.y/2)
 
     def bottom(self):
         return self.pos + vec2(0, self.size.y/2)
