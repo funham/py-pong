@@ -43,31 +43,19 @@ class RackBase(Actor):
         self.ball.pos.x = self.ball.pos.x - 2 * dx
         self.ball.vel.x *= -1
 
-    def is_ball_behind(self):
+    def collides_ball(self):
         trace = SegCollider(self.ball.pos, self.ball.prev)
-        print(f'{trace.p_list()=}')
-
         hit_surf = self.collider.left_seg(inv=self.side)
-        print(f'{hit_surf.p_list()=}')
-        # plt.plot([trace.p1.x, trace.p2.x],
-        #          [trace.p1.y, trace.p2.y])
-        # plt.plot([hit_surf.p1.x, hit_surf.p2.x],
-        #          [hit_surf.p1.y, hit_surf.p2.y])
 
-        # plt.show()
-        if trace.inter_seg(hit_surf):
-            print('hoba')
-            #     return True
-
-            # else:
-            #     return False
-        # pass
+        return trace.inter_seg(hit_surf)
 
     def post_phys(self, dt):
-        if self.is_ball_behind() and not self.coll:
+        ball_hit = self.collides_ball()
+
+        if ball_hit and not self.coll:
             self.reflect_ball(dt)
             self.coll = True
-        elif not self.is_ball_behind() and self.coll:
+        elif not ball_hit and self.coll:
             self.coll = False
 
         self.constrain()
