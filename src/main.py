@@ -38,7 +38,7 @@ rt = 0  # run time value
 while True:
 
     # time passed since last frame
-    dt = clock.tick(60) / 100
+    dt = clock.tick(2000) / 100
     rt += dt
 
     # checking for events
