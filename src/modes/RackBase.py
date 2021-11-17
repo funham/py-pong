@@ -39,10 +39,13 @@ class RackBase(Actor):
         delta = vec2(self.ball.pos - int_p)
         height = (int_p - self.pos).y  # will define reflected angle
         self.ball.vel.x *= -1
+        self.ball.pos.x -= delta.x * 2
 
     def collides_ball(self):
-        trace = SegCollider(self.ball.pos, self.ball.prev)
+        ball_surf = self.ball.collider.left(inv=-self.side)
+        trace = SegCollider(self.ball.prev, ball_surf)
         hit_surf = self.collider.left_seg(inv=self.side)
+        # print(trace.p_list(), self.collider.left_seg(inv=self.side).p_list())
 
         return trace.inter_seg(hit_surf)
 
@@ -52,6 +55,7 @@ class RackBase(Actor):
         if ball_hit and not self.coll:
             self.reflect_ball(ball_hit)
             self.coll = True
+            print(f'hoba {ball_hit}')
         elif not ball_hit and self.coll:
             self.coll = False
 

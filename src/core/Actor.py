@@ -52,9 +52,6 @@ class Actor(pg.sprite.Sprite):
         if self.collider:
             self.collider.pos = self.pos
 
-        self.image = pg.transform.scale(
-            self.image, self.size * self.level.scale)
-
     def post_phys(self, dt):
         if self.collider:
             self.collider.pos = self.pos

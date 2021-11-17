@@ -119,19 +119,21 @@ class RectCollider(Collider):
         return self.pos
 
     def top_left(self, inv=1):
-        return self.pos - self.size / 2
+        x = self.pos.x - self.size.x/2 * (inv)
+        y = self.pos.y - self.size.y/2 * 1
+        return vec2(x, y)
 
     def bottom_right(self):
         return self.pos + self.size / 2
 
     def top_right(self, inv=1):
-        x = self.pos.x + self.size.x / 2
-        y = self.pos.y - self.size.y / 2
+        x = self.pos.x - self.size.x/2 * (-inv)
+        y = self.pos.y - self.size.y/2 * 1
         return vec2(x, y)
 
     def bottom_left(self, inv=1):
-        x = self.pos.x - self.size.x / 2
-        y = self.pos.y + self.size.y / 2
+        x = self.pos.x - self.size.x/2 * (inv)
+        y = self.pos.y + self.size.y/2 * 1
         return vec2(x, y)
 
     def bottom_seg(self):
