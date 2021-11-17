@@ -1,5 +1,4 @@
-import pygame
-from pygame import key
+import pygame as pg
 from .BallBase import *
 from .import utils as ut
 
@@ -66,10 +65,10 @@ class RackBase(Actor):
         return in_x and in_y
 
     def handle_input(self, vel):
-        key_pressed = pygame.key.get_pressed()
+        key_pressed = pg.key.get_pressed()
 
-        UpDown_diff = (key_pressed[pygame.K_DOWN] - key_pressed[pygame.K_UP]) #difference between Up and Down 
-        WS_diff     = (key_pressed[pygame.K_s]    - key_pressed[pygame.K_w] ) #difference between W and S
+        UpDown_diff = (key_pressed[pg.K_DOWN] - key_pressed[pg.K_UP]) #difference between Up and Down 
+        WS_diff     = (key_pressed[pg.K_s]    - key_pressed[pg.K_w] ) #difference between W and S
         
         if self.side > 0: self.vel.y = vel * UpDown_diff #left racket
         if self.side < 0: self.vel.y = vel * WS_diff #right racket
