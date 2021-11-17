@@ -12,10 +12,7 @@ class RackClassic(RackBase):
         return super().pre_phys(dt)
 
     def post_phys(self):
-        self.constrain()
-        if self.rect.colliderect(self.ball.rect):
-            self.ball.vel.x *= -1
-
+        self.handle_input(self.max_vel)
         return super().post_phys()
 
 
@@ -31,3 +28,9 @@ class RackClassicAI(RackBaseAI):
 class BallClassic(BallBase):
     def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), rackets=None):
         super().__init__(level, pos, vel=vel)
+
+    def update(self, dt) -> None:
+        super().update(dt)
+        super().reflect()
+        super().check_goal()
+

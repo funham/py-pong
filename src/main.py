@@ -4,6 +4,8 @@ from pygame.constants import BLEND_RGB_ADD
 from core.core import *
 from modes.RackBase import *
 from modes.MClassic import *
+from modes.VisualEnvironment import *
+import core.Actor
 
 import core.cfg as cfg
 from modes.utils import sign
@@ -16,14 +18,14 @@ pg.display.set_icon(pg.image.load('../Assets/pong.png'))
 scr = pg.display.set_mode(cfg.SCR_SIZE)
 clock = pg.time.Clock()
 
-rack_group = pg.sprite.Group()
-ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(3, 1), rackets=rack_group)
+ball_group = pg.sprite.Group()
+ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(1, 0.5))
+ball_group.add(ball)
 
-rack1 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
-                      ball=ball, max_vel=5, difficulty=1)
+rack1 = RackClassic(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
+                      ball=ball, max_vel=5)
 rack2 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
                       ball=ball, max_vel=5, difficulty=1)
-
 
 ball_group = pg.sprite.Group()
 
@@ -31,6 +33,10 @@ ball_group.add(ball)
 
 rack_group.add(rack1)
 rack_group.add(rack2)
+
+visual_group = pg.sprite.Group()
+background = BackGround(scr, ball.players_goals)
+visual_group.add(background)
 
 bg_brightness = cfg.BG_DEFAULT_BRIGHTNESS  # 0 - 255
 rt = 0  # run time value

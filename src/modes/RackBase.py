@@ -1,3 +1,5 @@
+import pygame
+from pygame import key
 from .BallBase import *
 from .import utils as ut
 import matplotlib.pyplot as plt
@@ -20,7 +22,6 @@ class RackBase(Actor):
     # for some modes could be useful
     # should be added after apply_phys()
     def constrain(self):
-
         bounds = self.level.field
 
         if self.pos.y - self.size.y / 2 <= -bounds.y:
@@ -61,8 +62,16 @@ class RackBase(Actor):
 
     def post_phys(self, dt):
         self.constrain()
-
         return super().post_phys(dt)
+      
+    def handle_input(self, vel):
+        key_pressed = pygame.key.get_pressed()
+
+        UpDown_diff = (key_pressed[pygame.K_DOWN] - key_pressed[pygame.K_UP]) #difference between Up and Down 
+        WS_diff     = (key_pressed[pygame.K_s]    - key_pressed[pygame.K_w] ) #difference between W and S
+        
+        if self.side > 0: self.vel.y = vel * UpDown_diff #left racket
+        if self.side < 0: self.vel.y = vel * WS_diff #right racket
 
     def update(self, dt, upd_t) -> None:
         super().update(dt, upd_t)
