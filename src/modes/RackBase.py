@@ -2,6 +2,7 @@ import pygame
 from pygame import key
 from .BallBase import *
 from .import utils as ut
+import matplotlib.pyplot as plt
 
 import copy
 
@@ -11,7 +12,8 @@ import copy
 class RackBase(Actor):
     def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float):
         super().__init__(level=level,  # sprite_path='../Assets/rack.png',
-                         size=vec2(1, 5), vel=vec2(0, 0), pos=pos)
+                         size=vec2(1, 5), vel=vec2(0, 0), pos=pos,
+                         collider=RectCollider(size=vec2(1, 5), pos=pos))
         self.ball = ball
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)
@@ -19,52 +21,49 @@ class RackBase(Actor):
 
     # for some modes could be useful
     # should be added after apply_phys()
-    def check_bounds(self):
-
+    def constrain(self):
         bounds = self.level.field
-
-        if self.pos.x - self.size.x / 2 <= -bounds.x:
-            self.pos.x = -bounds.x + self.size.x / 2
 
         if self.pos.y - self.size.y / 2 <= -bounds.y:
             self.pos.y = -bounds.y + self.size.y / 2
-
-        if self.pos.x + self.size.x / 2 >= bounds.x:
-            self.pos.x = bounds.x - self.size.x / 2
+            self.vel.y = 0
 
         if self.pos.y + self.size.y / 2 >= bounds.y:
             self.pos.y = bounds.y - self.size.y / 2
+            self.vel.y = 0
 
-    def reflect_ball(self, dt):
-
-        def cb(obj, sign) -> vec2: return obj.pos + sign * obj.size / 2
-
-        rb = cb(self, -self.side).x
-        bb = cb(self.ball, self.side).x
-
-        dx = bb - rb
-
-        self.ball.pos.x = self.ball.pos.x - 2 * dx
+    def reflect_ball(self, int_p):
+        '''
+        takes the point ball hit racket in (intersection point)
+        '''
+        # delta with current ball position and hit point
+        delta = vec2(self.ball.pos - int_p)
+        height = (int_p - self.pos).y  # will define reflected angle
         self.ball.vel.x *= -1
+        self.ball.pos.x += delta.x * 2
 
-        # print(
-        #     f'bb={bb}, rb={rb}, dx={dx}, s={-2*dx*self.side}')
-        # print(f'next bb={ self.ball.pos.x + self.side * self.ball.size.x / 2}')
+    def collides_ball(self):
+        ball_surf = self.ball.collider.left(inv=-self.side)
+        trace = SegCollider(self.ball.prev, ball_surf)
+        hit_surf = self.collider.left_seg(inv=self.side)
 
-    def is_ball_behind(self):
+        return trace.inter_seg(hit_surf)
 
-        # calculate border function
-        def cb(pos, size, sign) -> vec2: return pos + sign * size / 2
+    def pre_phys(self, dt):
+        ball_hit = self.collides_ball()
 
-        in_y = cb(self.ball.np, self.ball.size, 1).y <= cb(self.pos, self.size, 1).y and \
-            cb(self.ball.np, self.ball.size, -
-               1).y >= cb(self.pos, self.size, -1).y
+        if ball_hit and not self.coll:
+            self.reflect_ball(ball_hit)
+            self.coll = True
+        elif not ball_hit and self.coll:
+            self.coll = False
 
-        in_x = self.ball.np.x * self.side >= self.pos.x * self.side
+        return super().pre_phys(dt)
 
-        # TODO check with correct trajectory
-        return in_x and in_y
-
+    def post_phys(self, dt):
+        self.constrain()
+        return super().post_phys(dt)
+      
     def handle_input(self, vel):
         key_pressed = pygame.key.get_pressed()
 
@@ -74,18 +73,8 @@ class RackBase(Actor):
         if self.side > 0: self.vel.y = vel * UpDown_diff #left racket
         if self.side < 0: self.vel.y = vel * WS_diff #right racket
 
-
-    # inherited sprite function
-    # called automatically before drawing
-    def update(self, dt) -> None:
-        if self.is_ball_behind() and not self.coll:
-            self.reflect_ball(dt)
-            self.coll = True
-
-        elif not self.is_ball_behind() and self.coll:
-            self.coll = False
-
-        super().apply_phys(dt)
+    def update(self, dt, upd_t) -> None:
+        super().update(dt, upd_t)
 
 
 # Base class for all Racket AI classes
@@ -97,10 +86,14 @@ class RackBaseAI(RackBase):
     def follow_ball(self):
         dy = (self.ball.pos - self.pos).y
 
-        if dy > self.size.y / 2:
-            self.vel.y = self.max_vel * ut.sign(dy)
-        else:
-            self.vel.y = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+        t_vel = 0
 
-    def update(self, dt) -> None:
-        super().update(dt)  # applies physics as well
+        if abs(dy) > self.size.y / 2:
+            t_vel = self.max_vel * ut.sign(dy)
+        else:
+            t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+
+        self.vel.y = t_vel
+
+    def update(self, dt, upd_t) -> None:
+        super().update(dt, upd_t)  # applies physics as well
