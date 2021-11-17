@@ -72,32 +72,6 @@ class SegCollider(Collider):
 
         return vec2(x, y) if in_x and in_y else None
 
-# TODO delete and make EllipseCollider instead
-
-
-class CircleColiider(Collider):
-    def __init__(self, size: float, pos: vec2) -> None:
-        super().__init__(size, pos)
-
-    def collides_point(self, point: vec2) -> bool:
-        point.magnitude_squared()
-        return (point - self.pos).magnitude_squared() <= self.size**2
-
-    def left(self):
-        return self.pos - vec2(self.size/2, 0)
-
-    def right(self):
-        return self.pos + vec2(self.size/2, 0)
-
-    def top(self):
-        return self.pos - vec2(0, self.size/2)
-
-    def bottom(self):
-        return self.pos + vec2(0, self.size/2)
-
-    def center(self):
-        return self.pos
-
 
 class RectCollider(Collider):
     def __init__(self, size: vec2, pos: vec2) -> None:
@@ -176,3 +150,35 @@ class RectCollider(Collider):
             res &= self.collides_point(p)
 
         return res
+
+
+# TODO delete and make EllipseCollider instead
+class CircleColiider(Collider):
+    def __init__(self, size: float, pos: vec2) -> None:
+        super().__init__(size, pos)
+
+    def collides_point(self, point: vec2) -> bool:
+        point.magnitude_squared()
+        return (point - self.pos).magnitude_squared() <= self.size**2
+
+    def left(self):
+        return self.pos - vec2(self.size/2, 0)
+
+    def right(self):
+        return self.pos + vec2(self.size/2, 0)
+
+    def top(self):
+        return self.pos - vec2(0, self.size/2)
+
+    def bottom(self):
+        return self.pos + vec2(0, self.size/2)
+
+    def center(self):
+        return self.pos
+
+    def collides_rect(self, rect: RectCollider):
+        for p in rect.p_list():
+            if self.collides_point(p):
+                return True
+
+        return rect.collides_point(self.pos)
