@@ -51,12 +51,12 @@ class Actor(pg.sprite.Sprite):
 
         if self.collider:
             self.collider.pos = self.pos
-            self.collider.size = self.size
+            # self.collider.size = self.size
 
     def post_phys(self, dt):
         if self.collider:
             self.collider.pos = self.pos
-            self.collider.size = self.size
+            # self.collider.size = self.size
 
         self.image = pg.transform.scale(
             self.image, self.size * self.level.scale)

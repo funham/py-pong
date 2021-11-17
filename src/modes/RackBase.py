@@ -18,6 +18,7 @@ class RackBase(Actor):
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)
         self.coll = False
+        self.c = 0
 
     # for some modes could be useful
     # should be added after apply_phys()
@@ -38,9 +39,9 @@ class RackBase(Actor):
         '''
         # delta with current ball position and hit point
         delta = vec2(self.ball.pos - int_p)
-        height = (int_p - self.pos).y  # will define reflected angle
+        height = (int_p - self.pos).y  # will define reflected angle... someday
         self.ball.vel.x *= -1
-        self.ball.pos.x += delta.x * 2
+        self.ball.pos.x += delta.x * 0
 
     def collides_ball(self):
         ball_surf = self.ball.collider.left(inv=-self.side)
@@ -51,10 +52,11 @@ class RackBase(Actor):
 
     def pre_phys(self, dt):
         ball_hit = self.collides_ball()
-
         if ball_hit and not self.coll:
             self.reflect_ball(ball_hit)
             self.coll = True
+            print(self.c)
+            self.c += 1
         elif not ball_hit and self.coll:
             self.coll = False
 
@@ -63,18 +65,19 @@ class RackBase(Actor):
     def post_phys(self, dt):
         self.constrain()
         return super().post_phys(dt)
-      
+
     def handle_input(self, vel):
         key_pressed = pygame.key.get_pressed()
 
-        UpDown_diff = (key_pressed[pygame.K_DOWN] - key_pressed[pygame.K_UP]) #difference between Up and Down 
-        WS_diff     = (key_pressed[pygame.K_s]    - key_pressed[pygame.K_w] ) #difference between W and S
-        
-        if self.side > 0: self.vel.y = vel * UpDown_diff #left racket
-        if self.side < 0: self.vel.y = vel * WS_diff #right racket
+        # difference between Up and Down
+        UpDown_diff = (key_pressed[pygame.K_DOWN] - key_pressed[pygame.K_UP])
+        # difference between W and S
+        WS_diff = (key_pressed[pygame.K_s] - key_pressed[pygame.K_w])
 
-    def update(self, dt, upd_t) -> None:
-        super().update(dt, upd_t)
+        if self.side > 0:
+            self.vel.y = vel * UpDown_diff  # left racket
+        if self.side < 0:
+            self.vel.y = vel * WS_diff  # right racket
 
 
 # Base class for all Racket AI classes
