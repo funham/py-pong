@@ -18,7 +18,6 @@ class RackBase(Actor):
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)
         self.coll = False
-        self.c = 0
 
     # for some modes could be useful
     # should be added after apply_phys()
@@ -40,7 +39,11 @@ class RackBase(Actor):
         # delta with current ball position and hit point
         delta = vec2(self.ball.pos - int_p)
         height = (int_p - self.pos).y  # will define reflected angle... someday
-        self.ball.vel.x *= -1
+        angle = math.pi * height / self.size.y/2
+        v = self.ball.vel.magnitude()
+        self.ball.vel = v * vec2((-self.side) * math.cos(angle),
+                                 math.sin(angle))
+        self.ball.vel *= 1.05
         self.ball.pos.x += delta.x * 0
 
     def collides_ball(self):
@@ -55,8 +58,6 @@ class RackBase(Actor):
         if ball_hit and not self.coll:
             self.reflect_ball(ball_hit)
             self.coll = True
-            print(self.c)
-            self.c += 1
         elif not ball_hit and self.coll:
             self.coll = False
 
@@ -91,10 +92,11 @@ class RackBaseAI(RackBase):
 
         t_vel = 0
 
-        if abs(dy) > self.size.y / 2:
-            t_vel = self.max_vel * ut.sign(dy)
-        else:
-            t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+        if abs(dy) > 2 / self.difficulty:
+            if abs(dy) > self.size.y / 2:
+                t_vel = self.max_vel * ut.sign(dy)
+            else:
+                t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
 
         self.vel.y = t_vel
 
