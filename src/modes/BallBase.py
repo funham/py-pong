@@ -31,11 +31,13 @@ class BallBase(Actor):
         if self.goal_can_happen and self.pos.x <= -self.level.field.x:
             self.players_goals[1] += 1
             self.pos = vec2(0, 0)
+            self.vel = vec2(2, 0)
             self.goal_can_happen = False
 
         if self.goal_can_happen and self.pos.x >= self.level.field.x:
             self.players_goals[0] += 1
             self.pos = vec2(0, 0)
+            self.vel = vec2(-2, 0)
             self.goal_can_happen = False
 
         if not self.goal_can_happen and self.pos.x > -self.level.field.x and self.pos.x < self.level.field.x:

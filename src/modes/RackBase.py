@@ -18,7 +18,6 @@ class RackBase(Actor):
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)
         self.coll = False
-        self.c = 0
 
     # for some modes could be useful
     # should be added after apply_phys()
@@ -40,7 +39,12 @@ class RackBase(Actor):
         # delta with current ball position and hit point
         delta = vec2(self.ball.pos - int_p)
         height = (int_p - self.pos).y  # will define reflected angle... someday
-        self.ball.vel.x *= -1
+        v = self.ball.vel.magnitude()
+        v += 0.5
+        a = height / self.size.y * math.pi /2 
+
+        self.ball.vel = v * vec2(math.cos(a), math.sin(a))
+        self.ball.vel.x *= -self.side
         self.ball.pos.x += delta.x * 0
 
     def collides_ball(self):
@@ -55,8 +59,6 @@ class RackBase(Actor):
         if ball_hit and not self.coll:
             self.reflect_ball(ball_hit)
             self.coll = True
-            print(self.c)
-            self.c += 1
         elif not ball_hit and self.coll:
             self.coll = False
 
@@ -66,18 +68,24 @@ class RackBase(Actor):
         self.constrain()
         return super().post_phys(dt)
 
-    def handle_input(self, vel):
+    def handle_input(self, dt, acc):
         key_pressed = pygame.key.get_pressed()
 
-        # difference between Up and Down
-        UpDown_diff = (key_pressed[pygame.K_DOWN] - key_pressed[pygame.K_UP])
-        # difference between W and S
-        WS_diff = (key_pressed[pygame.K_s] - key_pressed[pygame.K_w])
+        up_k = pygame.K_UP if self.side > 0 else pygame.K_w
+        dn_k = pygame.K_DOWN if self.side > 0 else pygame.K_s
 
-        if self.side > 0:
-            self.vel.y = vel * UpDown_diff  # left racket
-        if self.side < 0:
-            self.vel.y = vel * WS_diff  # right racket
+        # direction vector projection 
+        dir = (key_pressed[dn_k] - key_pressed[up_k])
+
+        # if nothing's pressed
+        acc = 2 * dt
+        if dir:
+            # acc = dt * 2 if dir != ut.sign(self.vel.y) else 1
+            
+            self.vel.y = ut.approach(self.vel.y, dir * self.max_vel, acc)
+        else:
+            self.vel.y = ut.approach(self.vel.y, 0, acc)
+
 
 
 # Base class for all Racket AI classes
