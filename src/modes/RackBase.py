@@ -67,18 +67,15 @@ class RackBase(Actor):
         self.constrain()
         return super().post_phys(dt)
 
-    def handle_input(self, vel):
+    def handle_input(self, dt, vel):
         key_pressed = pygame.key.get_pressed()
 
-        # difference between Up and Down
-        UpDown_diff = (key_pressed[pygame.K_DOWN] - key_pressed[pygame.K_UP])
-        # difference between W and S
-        WS_diff = (key_pressed[pygame.K_s] - key_pressed[pygame.K_w])
+        up = pygame.K_w if self.side < 0 else pygame.K_UP
+        dn = pygame.K_s if self.side < 0 else pygame.K_DOWN
 
-        if self.side > 0:
-            self.vel.y = vel * UpDown_diff  # left racket
-        if self.side < 0:
-            self.vel.y = vel * WS_diff  # right racket
+        dir = key_pressed[dn] - key_pressed[up]
+
+        self.vel.y = ut.approach(self.vel.y, self.max_vel * dir, dt * vel)
 
 
 # Base class for all Racket AI classes
@@ -87,7 +84,7 @@ class RackBaseAI(RackBase):
         super().__init__(level, pos, ball, max_vel)
         self.difficulty = difficulty
 
-    def follow_ball(self):
+    def follow_ball(self, dt):
         dy = (self.ball.pos - self.pos).y
 
         t_vel = 0
@@ -98,7 +95,5 @@ class RackBaseAI(RackBase):
             else:
                 t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
 
-        self.vel.y = t_vel
-
-    def update(self, dt, upd_t) -> None:
-        super().update(dt, upd_t)  # applies physics as well
+        # self.vel.y = t_vel
+        self.vel.y = ut.approach(self.vel.y, t_vel, dt)

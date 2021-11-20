@@ -9,11 +9,8 @@ class RackClassic(RackBase):
         super().__init__(level, pos, ball, max_vel)
 
     def pre_phys(self, dt):
-        self.handle_input(self.max_vel)
+        self.handle_input(dt, 2)
         return super().pre_phys(dt)
-
-    def post_phys(self, dt):
-        return super().post_phys(dt)
 
 
 class RackClassicAI(RackBaseAI):
@@ -21,10 +18,10 @@ class RackClassicAI(RackBaseAI):
         super().__init__(level, pos, ball, max_vel, difficulty=difficulty)
 
     def pre_phys(self, dt):
-        self.follow_ball()
+        self.follow_ball(dt)
         return super().pre_phys(dt)
 
 
 class BallClassic(BallBase):
-    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), rackets=None):
-        super().__init__(level, pos, vel=vel)
+    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), start_vel=vec2(2, 0)):
+        super().__init__(level, pos, vel=vel, start_vel=vec2(2, 0))

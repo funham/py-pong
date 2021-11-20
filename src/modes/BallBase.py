@@ -6,13 +6,13 @@ import copy
 
 
 class BallBase(Actor):
-    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), rackets=None):
+    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), start_vel=None):
         super().__init__(level=level,  # sprite_path='../Assets/ball.png',
                          size=vec2(1, 1), vel=vel, pos=pos)
-        self.racks = rackets
         self.goal_can_happen = True
         self.players_goals = [0, 0]
 
+        self.start_vel = start_vel if start_vel else vec2(2, 0)
         self.collider = RectCollider(vec2(1, 1), pos)
         self.prev = self.pos
 
@@ -27,20 +27,18 @@ class BallBase(Actor):
             self.pos.y += 2 * db
             self.vel.y *= -1
 
+    def reset(self, side):
+        self.pos = vec2(0, 0)
+        self.vel = side * self.start_vel
+
     def check_goal(self):
-        if self.goal_can_happen and self.pos.x <= -self.level.field.x:
-            self.players_goals[1] += 1
-            self.pos = vec2(0, 0)
-            self.vel = vec2(2, 0)
+        side = ut.sign(self.pos.x)
+        if self.goal_can_happen and abs(self.pos.x) >= self.level.field.x:
+            self.players_goals[(side + 1) // 2] += 1
+            self.reset(side)
             self.goal_can_happen = False
 
-        if self.goal_can_happen and self.pos.x >= self.level.field.x:
-            self.players_goals[0] += 1
-            self.pos = vec2(0, 0)
-            self.vel = vec2(-2, 0)
-            self.goal_can_happen = False
-
-        if not self.goal_can_happen and self.pos.x > -self.level.field.x and self.pos.x < self.level.field.x:
+        if not self.goal_can_happen and abs(self.pos.x) < self.level.field.x:
             self.goal_can_happen = True
 
     def pre_phys(self, dt):
