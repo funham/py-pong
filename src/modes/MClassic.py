@@ -10,6 +10,7 @@ class RackClassic(RackBase):
 
     def pre_phys(self, dt):
         self.handle_input(dt, 2)
+
         return super().pre_phys(dt)
 
 

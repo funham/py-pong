@@ -26,6 +26,7 @@ rack1 = RackClassic(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
 rack2 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
                       ball=ball, max_vel=4, difficulty=1)
 
+
 rack_group.add(rack1)
 rack_group.add(rack2)
 

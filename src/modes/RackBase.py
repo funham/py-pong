@@ -39,11 +39,13 @@ class RackBase(Actor):
         # delta with current ball position and hit point
         delta = vec2(self.ball.pos - int_p)
         height = (int_p - self.pos).y  # will define reflected angle... someday
-        angle = math.pi * height / self.size.y/2
+
         v = self.ball.vel.magnitude()
-        self.ball.vel = v * vec2((-self.side) * math.cos(angle),
-                                 math.sin(angle))
-        self.ball.vel *= 1.05
+        v += 0.5
+        a = height / self.size.y * math.pi / 2
+
+        self.ball.vel = v * vec2(math.cos(a), math.sin(a))
+        self.ball.vel.x *= -self.side
         self.ball.pos.x += delta.x * 0
 
     def collides_ball(self):
@@ -77,8 +79,9 @@ class RackBase(Actor):
 
         self.vel.y = ut.approach(self.vel.y, self.max_vel * dir, dt * vel)
 
-
 # Base class for all Racket AI classes
+
+
 class RackBaseAI(RackBase):
     def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty):
         super().__init__(level, pos, ball, max_vel)
