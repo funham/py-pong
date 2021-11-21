@@ -21,6 +21,12 @@ class SegCollider(Collider):
         self.min_x = min(p1.x, p2.x)
         self.max_x = max(p1.x, p2.x)
 
+    def top(self):
+        return self.p1 if self.p1.y < self.p2.y else self.p2
+
+    def bottom(self):
+        return self.p1 if self.p1.y > self.p2.y else self.p2
+
     def center(self):
         return (self.p1 + self.p2)/2
 

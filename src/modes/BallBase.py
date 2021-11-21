@@ -14,7 +14,7 @@ class BallBase(Actor):
 
         self.start_vel = start_vel if start_vel else vec2(2, 0)
         self.collider = RectCollider(vec2(1, 1), pos)
-        self.prev = self.pos
+        self.prev = self.collider
         self.reflections = 1
 
     def reflect(self):
@@ -44,7 +44,7 @@ class BallBase(Actor):
             self.goal_can_happen = True
 
     def pre_phys(self, dt):
-        self.prev = copy.copy(self.pos)
+        self.prev = copy.copy(self.collider)
         return super().pre_phys(dt)
 
     def post_phys(self, dt):

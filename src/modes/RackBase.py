@@ -44,17 +44,37 @@ class RackBase(Actor):
         v += 1 / self.ball.reflections
         a = height / self.size.y * math.pi / 2
 
-        self.ball.vel = v * vec2(math.cos(a), math.sin(a))
-        self.ball.vel.x *= -self.side
+        # self.ball.vel = v * vec2(math.cos(a), math.sin(a))
+        # self.ball.vel.x *= -self.side
+        self.ball.vel.x *= -1
         self.ball.pos.x += delta.x * 0
         self.ball.reflections += 1
 
     def collides_ball(self):
-        ball_surf = self.ball.collider.left(inv=-self.side)
-        trace = SegCollider(self.ball.prev, ball_surf)
+        curr_bsurf = self.ball.collider.left_seg(inv=-self.side)
+        prev_bsurf = self.ball.prev
+
+        # traces of top and bottom of ball surf
+        top_trace = SegCollider(prev_bsurf.top(),
+                                curr_bsurf.top())
+        btm_trace = SegCollider(prev_bsurf.bottom(),
+                                curr_bsurf.bottom())
+
         hit_surf = self.collider.left_seg(inv=self.side)
 
-        return trace.inter_seg(hit_surf)
+        inter_top = top_trace.inter_seg(hit_surf)
+        inter_btm = btm_trace.inter_seg(hit_surf)
+
+        if inter_top == None and inter_btm == None:
+            return None
+
+        if inter_top == None:
+            return inter_btm
+
+        if inter_btm == None:
+            return inter_top
+
+        return (inter_top + inter_btm) / 2
 
     def pre_phys(self, dt):
         ball_hit = self.collides_ball()
