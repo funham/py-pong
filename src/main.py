@@ -16,22 +16,28 @@ pg.display.set_icon(pg.image.load('../Assets/pong.png'))
 scr = pg.display.set_mode(cfg.SCR_SIZE)
 clock = pg.time.Clock()
 
-rack_group = pg.sprite.Group()
+
 ball_group = pg.sprite.Group()
-ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(-1, 0))
+ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(-3, 1))
 ball_group.add(ball)
 
+rack_group = pg.sprite.Group()
 rack1 = RackClassic(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
                     ball=ball, max_vel=5)
-rack2 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
-                      ball=ball, max_vel=5, difficulty=1)
-
+rack2 = RackClassic(level=lvl, pos=vec2(lvl.field.x - 2, 0),
+                      ball=ball, max_vel=5)
 rack_group.add(rack1)
 rack_group.add(rack2)
 
 visual_group = pg.sprite.Group()
+
 background = BackGround(scr, ball.players_goals)
+particle_sys = ParticleSystem(scr, ball)
+
+ball.particle_system = particle_sys 
+
 visual_group.add(background)
+visual_group.add(particle_sys)
 
 bg_brightness = cfg.BG_DEFAULT_BRIGHTNESS  # 0 - 255
 rt = 0  # run time value
@@ -48,10 +54,12 @@ while True:
             pg.quit()
             sys.exit()
 
+
     # setting background color
     scr.fill(bg_brightness * pg.Vector3(1, 1, 1))
 
     # updating all sprite groups
+    visual_group.update()
     ball_group.update(dt, UPD.PRE)
     rack_group.update(dt, UPD.PRE)
 
@@ -61,8 +69,6 @@ while True:
     # drawing all sprite groups
     ball_group.draw(scr)
     rack_group.draw(scr)
-
-    visual_group.update()
     
     # putting image on the screen
     pg.display.update()

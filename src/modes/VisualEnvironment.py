@@ -1,6 +1,11 @@
-from pygame.constants import SCRAP_SELECTION
+from math import nan
+import pygame as pg
+from pygame.time import Clock
+from pygame.transform import scale
+from core.cfg import SCR_CENTER
 from core.core import *
 from modes.BallBase import *
+import random
 
 
 class BackGround(pg.sprite.Sprite):
@@ -34,3 +39,53 @@ class BackGround(pg.sprite.Sprite):
     def update(self):
         self.draw_bg()
         self.draw_score()
+
+class ParticleSystem(pg.sprite.Sprite):
+
+    def __init__(self, scr, ball):
+        self.scr  = scr
+        self.ball = ball.rect
+        self.trails     = [] #list for trail behind ball
+        self.goal_booms = [] #list for goal explosions
+
+        pg.sprite.Sprite.__init__(self)
+
+    def ball_trail(self):
+        currpos  = []
+        currpos += [self.ball[0],self.ball[1]]
+        
+        self.trails.append([currpos, [0,0], 255]) #pos, vell, transperency
+        
+        for particle in self.trails:
+            particle[0][0] += particle[1][0] #changing x
+            particle[0][1] += particle[1][1] #changing y
+            particle[2] -= 40                #changing transperency / length of trail
+            s = pg.Surface((13,13))          #trail
+            s.set_alpha(particle[2])
+            s.fill((150,150,150))
+            self.scr.blit(s, (int(particle[0][0]), int(particle[0][1])))
+            if particle[2] <= 0:
+                self.trails.remove(particle) #removing transperence particles
+
+    def goal_boom(self, direction): 
+        currpos = []
+        currpos += [self.ball[0],self.ball[1]]
+
+        if direction: #left
+            self.goal_booms.append([currpos, [  random.randint(0, 20) / 10, random.randint(0, 20) / 10-1]
+                                    , random.randint(4, 8)]) #pos, vel, radius
+        else:         #right
+            self.goal_booms.append([currpos, [-(random.randint(0, 20) / 10),random.randint(0, 20) / 10-1]
+                                    , random.randint(4, 8)]) #pos, vel, radius
+
+    def update(self):
+        self.ball_trail()
+
+        for boom in self.goal_booms: # checking for goal
+            boom[0][0] += boom[1][0] #changing x
+            boom[0][1] += boom[1][1] #changing y
+            boom[2] -= 0.1           #changing radius
+            pg.draw.circle(self.scr, (255, 255, 255), [int(boom[0][0]), int(boom[0][1])], int(boom[2]))
+            if boom[2] <= 0:
+                self.goal_booms.remove(boom) #removing very little particles
+
