@@ -15,6 +15,7 @@ class BallBase(Actor):
         self.start_vel = start_vel if start_vel else vec2(2, 0)
         self.collider = RectCollider(vec2(1, 1), pos)
         self.prev = self.pos
+        self.reflections = 1
 
     def reflect(self):
         vh = ut.sign(self.pos.y)  # vertical half
@@ -30,11 +31,12 @@ class BallBase(Actor):
     def reset(self, side):
         self.pos = vec2(0, 0)
         self.vel = side * self.start_vel
+        self.reflections = 1
 
     def check_goal(self):
         side = ut.sign(self.pos.x)
         if self.goal_can_happen and abs(self.pos.x) >= self.level.field.x:
-            self.players_goals[(side + 1) // 2] += 1
+            self.players_goals[-(side - 1) // 2] += 1
             self.reset(side)
             self.goal_can_happen = False
 

@@ -9,7 +9,7 @@ class RackClassic(RackBase):
         super().__init__(level, pos, ball, max_vel)
 
     def pre_phys(self, dt):
-        self.handle_input(dt, 2)
+        self.handle_input(dt)
 
         return super().pre_phys(dt)
 

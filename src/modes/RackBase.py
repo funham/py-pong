@@ -41,12 +41,13 @@ class RackBase(Actor):
         height = (int_p - self.pos).y  # will define reflected angle... someday
 
         v = self.ball.vel.magnitude()
-        v += 0.5
+        v += 1 / self.ball.reflections
         a = height / self.size.y * math.pi / 2
 
         self.ball.vel = v * vec2(math.cos(a), math.sin(a))
         self.ball.vel.x *= -self.side
         self.ball.pos.x += delta.x * 0
+        self.ball.reflections += 1
 
     def collides_ball(self):
         ball_surf = self.ball.collider.left(inv=-self.side)
@@ -69,7 +70,7 @@ class RackBase(Actor):
         self.constrain()
         return super().post_phys(dt)
 
-    def handle_input(self, dt, vel):
+    def handle_input(self, dt):
         key_pressed = pygame.key.get_pressed()
 
         up = pygame.K_w if self.side < 0 else pygame.K_UP
@@ -77,7 +78,8 @@ class RackBase(Actor):
 
         dir = key_pressed[dn] - key_pressed[up]
 
-        self.vel.y = ut.approach(self.vel.y, self.max_vel * dir, dt * vel)
+        self.vel.y = ut.approach(
+            self.vel.y, self.max_vel * dir, dt * self.max_vel)
 
 # Base class for all Racket AI classes
 
@@ -98,5 +100,5 @@ class RackBaseAI(RackBase):
             else:
                 t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
 
-        # self.vel.y = t_vel
-        self.vel.y = ut.approach(self.vel.y, t_vel, dt)
+        t_vel *= self.difficulty
+        self.vel.y = ut.approach(self.vel.y, t_vel, dt * self.max_vel)

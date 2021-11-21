@@ -21,10 +21,10 @@ ball_group = pg.sprite.Group()
 ball = BallClassic(lvl, pos=vec2(0, 0), vel=vec2(3, 0), start_vel=vec2(5, 0))
 ball_group.add(ball)
 
-rack1 = RackClassic(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
-                    ball=ball, max_vel=3)
-rack2 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
-                      ball=ball, max_vel=4, difficulty=1)
+rack1 = RackClassic(level=lvl, pos=vec2(lvl.field.x - 2, 0),
+                    ball=ball, max_vel=4)
+rack2 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
+                      ball=ball, max_vel=3, difficulty=1)
 
 
 rack_group.add(rack1)
