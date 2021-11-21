@@ -26,9 +26,6 @@ class BackGround(pg.sprite.Sprite):
                                                      2-1, dot), (cfg.SCR_SIZE.x/2-1, dot+10), 2)
             dot = dot + 20
 
-        pg.draw.line(self.scr, (0, 100, 0), (0, cfg.SCR_CENTER.y),
-                     (cfg.SCR_SIZE.x, cfg.SCR_CENTER.y), 1)
-
     def draw_score(self):
         player1_score = self.font.render(
             str(self.players_scores[0]), False, (255, 255, 255))
