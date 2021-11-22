@@ -44,9 +44,9 @@ class RackBase(Actor):
         v += 1 / self.ball.reflections
         a = height / self.size.y * math.pi / 2
 
-        # self.ball.vel = v * vec2(math.cos(a), math.sin(a))
-        # self.ball.vel.x *= -self.side
-        self.ball.vel.x *= -1
+        self.ball.vel = v * vec2(math.cos(a), math.sin(a))
+        self.ball.vel.x *= -self.side
+        
         self.ball.pos.x += delta.x * 0
         self.ball.reflections += 1
 
