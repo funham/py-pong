@@ -6,18 +6,21 @@ import copy
 
 
 class BallBase(Actor):
-    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), rackets=None):
+    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), start_vel=None):
         super().__init__(level=level,  # sprite_path='../Assets/ball.png',
                          size=vec2(1, 1), vel=vel, pos=pos)
-        
+
         self.ball_stopped = [False, True, 0, vel] #super list, that contains all you need for timer
         self.ball_stopped[3] = self.vel
+        
         self.goal_can_happen = True
         self.players_goals = [0, 0]
         self.particle_system = None #for calling particles
 
+        self.start_vel = start_vel if start_vel else vec2(2, 0)
         self.collider = RectCollider(vec2(1, 1), pos)
-        self.prev = self.pos
+        self.prev = self.collider
+        self.reflections = 1
 
     def reflect(self):
         vh = ut.sign(self.pos.y)  # vertical half
@@ -30,23 +33,23 @@ class BallBase(Actor):
             self.pos.y += 2 * db
             self.vel.y *= -1
 
+
+    def reset(self, side):
+        self.pos = vec2(0, 0)
+        self.vel = side * self.start_vel
+        self.reflections = 1
+
     def check_goal(self):
-
-        if self.goal_can_happen and self.pos.x <= -self.level.field.x:
-            self.players_goals[1] += 1
+        side = ut.sign(self.pos.x)
+        if self.goal_can_happen and abs(self.pos.x) >= self.level.field.x:
+            self.players_goals[-(side - 1) // 2] += 1
             for i in range(10): #number of particles
-                self.particle_system.goal_boom(True)
-            self.ball_stopped[0] = True
+                self.particle_system.goal_boom(side)
+            self.reset(side)
+
             self.goal_can_happen = False
 
-        if self.goal_can_happen and self.pos.x >= self.level.field.x:
-            self.players_goals[0] += 1
-            for i in range(10): #number of particles
-                self.particle_system.goal_boom(False)
-            self.ball_stopped[0] = True
-            self.goal_can_happen = False
-
-        if not self.goal_can_happen and self.pos.x > -self.level.field.x and self.pos.x < self.level.field.x:
+        if not self.goal_can_happen and abs(self.pos.x) < self.level.field.x:
             self.goal_can_happen = True
 
     def timer(self, milisec):
@@ -64,7 +67,7 @@ class BallBase(Actor):
 
 
     def pre_phys(self, dt):
-        self.prev = copy.copy(self.pos)
+        self.prev = copy.copy(self.collider)
         return super().pre_phys(dt)
 
     def post_phys(self, dt):

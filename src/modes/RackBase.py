@@ -18,7 +18,6 @@ class RackBase(Actor):
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)
         self.coll = False
-        self.c = 0
 
     # for some modes could be useful
     # should be added after apply_phys()
@@ -40,23 +39,48 @@ class RackBase(Actor):
         # delta with current ball position and hit point
         delta = vec2(self.ball.pos - int_p)
         height = (int_p - self.pos).y  # will define reflected angle... someday
-        self.ball.vel.x *= -1
+
+        v = self.ball.vel.magnitude()
+        v += 1 / self.ball.reflections
+        a = height / self.size.y * math.pi / 2
+
+        self.ball.vel = v * vec2(math.cos(a), math.sin(a))
+        self.ball.vel.x *= -self.side
+        
         self.ball.pos.x += delta.x * 0
+        self.ball.reflections += 1
 
     def collides_ball(self):
-        ball_surf = self.ball.collider.left(inv=-self.side)
-        trace = SegCollider(self.ball.prev, ball_surf)
+        curr_bsurf = self.ball.collider.left_seg(inv=-self.side)
+        prev_bsurf = self.ball.prev.left_seg(inv=self.side)
+
+        # traces of top and bottom of ball surf
+        top_trace = SegCollider(prev_bsurf.top(),
+                                curr_bsurf.top())
+        btm_trace = SegCollider(prev_bsurf.bottom(),
+                                curr_bsurf.bottom())
+
         hit_surf = self.collider.left_seg(inv=self.side)
 
-        return trace.inter_seg(hit_surf)
+        inter_top = top_trace.inter_seg(hit_surf)
+        inter_btm = btm_trace.inter_seg(hit_surf)
+
+        if inter_top == None and inter_btm == None:
+            return None
+
+        if inter_top == None:
+            return inter_btm
+
+        if inter_btm == None:
+            return inter_top
+
+        return (inter_top + inter_btm) / 2
 
     def pre_phys(self, dt):
         ball_hit = self.collides_ball()
         if ball_hit and not self.coll:
             self.reflect_ball(ball_hit)
             self.coll = True
-            print(self.c)
-            self.c += 1
         elif not ball_hit and self.coll:
             self.coll = False
 
@@ -66,37 +90,35 @@ class RackBase(Actor):
         self.constrain()
         return super().post_phys(dt)
 
-    def handle_input(self, vel):
+    def handle_input(self, dt):
         key_pressed = pygame.key.get_pressed()
 
-        # difference between Up and Down
-        UpDown_diff = (key_pressed[pygame.K_DOWN] - key_pressed[pygame.K_UP])
-        # difference between W and S
-        WS_diff = (key_pressed[pygame.K_s] - key_pressed[pygame.K_w])
+        up = pygame.K_w if self.side < 0 else pygame.K_UP
+        dn = pygame.K_s if self.side < 0 else pygame.K_DOWN
 
-        if self.side > 0:
-            self.vel.y = vel * UpDown_diff  # left racket
-        if self.side < 0:
-            self.vel.y = vel * WS_diff  # right racket
+        dir = key_pressed[dn] - key_pressed[up]
 
+        self.vel.y = ut.approach(
+            self.vel.y, self.max_vel * dir, dt * self.max_vel)
 
 # Base class for all Racket AI classes
+
+
 class RackBaseAI(RackBase):
     def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty):
         super().__init__(level, pos, ball, max_vel)
         self.difficulty = difficulty
 
-    def follow_ball(self):
+    def follow_ball(self, dt):
         dy = (self.ball.pos - self.pos).y
 
         t_vel = 0
 
-        if abs(dy) > self.size.y / 2:
-            t_vel = self.max_vel * ut.sign(dy)
-        else:
-            t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+        if abs(dy) > 2 / self.difficulty:
+            if abs(dy) > self.size.y / 2:
+                t_vel = self.max_vel * ut.sign(dy)
+            else:
+                t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
 
-        self.vel.y = t_vel
-
-    def update(self, dt, upd_t) -> None:
-        super().update(dt, upd_t)  # applies physics as well
+        t_vel *= self.difficulty
+        self.vel.y = ut.approach(self.vel.y, t_vel, dt * self.max_vel)
