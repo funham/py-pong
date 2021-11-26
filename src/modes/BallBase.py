@@ -36,26 +36,20 @@ class BallBase(Actor):
             for i in range(5):
                 self.particle_system.wall_boom(side, 4)
 
-
-    def reset(self, side):
-        self.pos = vec2(0, 0)
-        self.vel = side * self.start_vel
-        self.reflections = 1
-
     def check_goal(self):
-        side = ut.sign(self.pos.x)
+        self.side = ut.sign(self.pos.x)
         if self.goal_can_happen and abs(self.pos.x) >= self.level.field.x:
-            self.players_goals[-(side - 1) // 2] += 1
+            self.players_goals[-(self.side - 1) // 2] += 1
             for i in range(10): #number of particles
-                self.particle_system.goal_boom(side, 8)
-            self.reset(side)
+                self.particle_system.goal_boom(self.side, 7)
+            self.ball_stopped[0] = 1
 
             self.goal_can_happen = False
 
         if not self.goal_can_happen and abs(self.pos.x) < self.level.field.x:
             self.goal_can_happen = True
 
-    def timer(self, milisec):
+    def timer(self, milisec, sd):
         if self.ball_stopped[0] and self.ball_stopped[1]:
             self.ball_stopped[2] = pg.time.get_ticks()
             self.pos = vec2(0, 0)
@@ -64,7 +58,7 @@ class BallBase(Actor):
 
         if self.ball_stopped[0] and not self.ball_stopped[1]:
             if pg.time.get_ticks() - self.ball_stopped[2] > milisec:
-                self.vel = self.ball_stopped[3]
+                self.vel = sd * self.start_vel
                 self.ball_stopped[0], self.ball_stopped[1]  = False, True
         
 
@@ -75,7 +69,7 @@ class BallBase(Actor):
 
     def post_phys(self, dt):
         self.check_goal()
-        self.timer(1000)
+        self.timer(1000, self.side)
         self.reflect()
         return super().post_phys(dt)
 

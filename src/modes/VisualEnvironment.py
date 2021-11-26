@@ -1,8 +1,5 @@
-from math import nan
 import pygame as pg
-from pygame.time import Clock
-from pygame.transform import scale
-from core.cfg import SCR_CENTER
+from pygame.constants import BLEND_ADD
 from core.core import *
 from modes.BallBase import *
 import random
@@ -54,20 +51,18 @@ class ParticleSystem(pg.sprite.Sprite):
 
         pg.sprite.Sprite.__init__(self)
 
-    def ball_trail(self):
-        currpos  = []
-        currpos += [self.ball[0],self.ball[1]]
-        
-        self.trails.append([currpos, [0,0], 255]) #pos, vell, transperency
+    def ball_trail(self): #pos, vel, radius
+        #self.trails.append([[self.ball[0],self.ball[1]], [0,0], 13]) #pos, vell, transperency
         
         for particle in self.trails:
             particle[0][0] += particle[1][0] #changing x
             particle[0][1] += particle[1][1] #changing y
-            particle[2] -= 40                #changing transperency / length of trail
+            particle[2] -= 0.1                #changing transperency / length of trail
             s = pg.Surface((13,13))          #trail
             s.set_alpha(particle[2])
             s.fill((150,150,150))
-            self.scr.blit(s, (int(particle[0][0]), int(particle[0][1])))
+            pg.transform.scale(s,(particle[2], particle[2]))
+            self.scr.blit(s, (int(particle[0][0]), int(particle[0][1])), special_flags = BLEND_ADD)
             if particle[2] <= 0:
                 self.trails.remove(particle) #removing transperence particles
 
@@ -80,6 +75,18 @@ class ParticleSystem(pg.sprite.Sprite):
         self.booms.append([[self.ball[0] + 3,self.ball[1]], [random.randint(-20, 20) / 10,-direction * random.randint(0, 20) / 10]
                                     , random.randint(4, 8)*(size/10)]) #pos, vel, radius
 
+    def circle_surf(self, radius, color):
+        surf = pg.Surface((radius * 2, radius * 2))
+        pg.draw.circle(surf, color, (radius, radius), radius)
+        surf.set_colorkey((0, 0, 0))
+        return surf
+
+    def rect_surf(self, scale, color):
+        surf = pg.Surface((scale[0], scale[1]))
+        pg.draw.rect(surf, color,(self.ball[0],self.ball[1],13,13))
+        surf.set_colorkey((0, 0, 0))
+        return surf
+
     def update(self):
         self.ball_trail()
 
@@ -88,6 +95,10 @@ class ParticleSystem(pg.sprite.Sprite):
             boom[0][1] += boom[1][1] #changing y
             boom[2] -= 0.1           #changing radius
             pg.draw.circle(self.scr, (255, 255, 255), [int(boom[0][0]), int(boom[0][1])], int(boom[2]))
+            radius = boom[2] * 2
+            self.scr.blit(self.circle_surf(radius, (20, 20, 20)), (int(boom[0][0] - radius), int(boom[0][1] - radius)), special_flags = BLEND_ADD)
+            radius = boom[2] * 3
+            self.scr.blit(self.circle_surf(radius, (20, 20, 20)), (int(boom[0][0] - radius), int(boom[0][1] - radius)), special_flags = BLEND_ADD)
             if boom[2] <= 0:
                 self.booms.remove(boom) #removing very little particles
 
