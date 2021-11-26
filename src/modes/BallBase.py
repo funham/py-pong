@@ -23,6 +23,7 @@ class BallBase(Actor):
         self.reflections = 1
 
     def reflect(self):
+        side = ut.sign(self.pos.y)
         vh = ut.sign(self.pos.y)  # vertical half
 
         # delta with border
@@ -32,6 +33,8 @@ class BallBase(Actor):
         if ut.sign(db) == -vh:
             self.pos.y += 2 * db
             self.vel.y *= -1
+            for i in range(5):
+                self.particle_system.wall_boom(side, 4)
 
 
     def reset(self, side):
@@ -44,7 +47,7 @@ class BallBase(Actor):
         if self.goal_can_happen and abs(self.pos.x) >= self.level.field.x:
             self.players_goals[-(side - 1) // 2] += 1
             for i in range(10): #number of particles
-                self.particle_system.goal_boom(side)
+                self.particle_system.goal_boom(side, 8)
             self.reset(side)
 
             self.goal_can_happen = False

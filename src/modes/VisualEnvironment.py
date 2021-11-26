@@ -50,7 +50,7 @@ class ParticleSystem(pg.sprite.Sprite):
         self.scr  = scr
         self.ball = ball.rect
         self.trails     = [] #list for trail behind ball
-        self.goal_booms = [] #list for goal explosions
+        self.booms = [] #list for goal explosions
 
         pg.sprite.Sprite.__init__(self)
 
@@ -71,21 +71,23 @@ class ParticleSystem(pg.sprite.Sprite):
             if particle[2] <= 0:
                 self.trails.remove(particle) #removing transperence particles
 
-    def goal_boom(self, direction): 
-        currpos = []
-        currpos += [self.ball[0],self.ball[1]]
+    def goal_boom(self, direction, size): 
 
-        self.goal_booms.append([currpos, [-direction * random.randint(0, 20) / 10, random.randint(0, 20) / 10-1]
-                                    , random.randint(4, 8)]) #pos, vel, radius
+        self.booms.append([[self.ball[0] + 3,self.ball[1]], [(-direction * random.randint(0, 20) / 10), random.randint(-20, 20) / 10]
+                                    , random.randint(4, 8)*(size/10)]) #pos, vel, radius
+
+    def wall_boom(self, direction, size):
+        self.booms.append([[self.ball[0] + 3,self.ball[1]], [random.randint(-20, 20) / 10,-direction * random.randint(0, 20) / 10]
+                                    , random.randint(4, 8)*(size/10)]) #pos, vel, radius
 
     def update(self):
         self.ball_trail()
 
-        for boom in self.goal_booms: # checking for goal
+        for boom in self.booms: # checking for goal
             boom[0][0] += boom[1][0] #changing x
             boom[0][1] += boom[1][1] #changing y
             boom[2] -= 0.1           #changing radius
             pg.draw.circle(self.scr, (255, 255, 255), [int(boom[0][0]), int(boom[0][1])], int(boom[2]))
             if boom[2] <= 0:
-                self.goal_booms.remove(boom) #removing very little particles
+                self.booms.remove(boom) #removing very little particles
 

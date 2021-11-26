@@ -47,6 +47,9 @@ class RackBase(Actor):
         self.ball.vel = v * vec2(math.cos(a), math.sin(a))
         self.ball.vel.x *= -self.side
         
+        for i in range(5):
+            self.ball.particle_system.goal_boom(self.side, 4)
+
         self.ball.pos.x += delta.x * 0
         self.ball.reflections += 1
 
