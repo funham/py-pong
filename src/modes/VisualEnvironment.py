@@ -16,24 +16,33 @@ class BackGround(pg.sprite.Sprite):
         dot = 0
 
         for i in range(10):
-            pg.draw.line(self.scr, (250, 250, 250), (cfg.SCR_SIZE.x /
-                                                     2-1, dot), (cfg.SCR_SIZE.x/2-1, dot+10), 2)
+            pg.draw.line(self.scr, (250, 250, 250),
+                         (cfg.SCR_SIZE.x / 2-1, dot),
+                         (cfg.SCR_SIZE.x/2-1, dot+10), 2)
             dot = dot + 20
+
         dot += 10
 
         for i in range(10):
-            pg.draw.line(self.scr, (250, 250, 250), (cfg.SCR_SIZE.x /
-                                                     2-1, dot), (cfg.SCR_SIZE.x/2-1, dot+10), 2)
+            pg.draw.line(self.scr, (250, 250, 250),
+                         (cfg.SCR_SIZE.x / 2-1, dot),
+                         (cfg.SCR_SIZE.x/2-1, dot+10), 2)
             dot = dot + 20
 
     def draw_score(self):
         player1_score = self.font.render(
-            str(self.players_scores[0]), False, (255, 255, 255))
+            str(self.players_scores[0]),
+            False, (255, 255, 255))
+
         player2_score = self.font.render(
-            str(self.players_scores[1]), False, (255, 255, 255))
-        self.scr.blit(player1_score, (SCR_SIZE.x/2 -
-                                      30 if self.players_scores[0] < 10 else SCR_SIZE.x/2 - 50, 20))
-        self.scr.blit(player2_score, (SCR_SIZE.x/2+13, 20))
+            str(self.players_scores[1]),
+            False, (255, 255, 255))
+
+        self.scr.blit(player1_score,
+                      (SCR_SIZE.x/2 - 30 if self.players_scores[0] < 10 else SCR_SIZE.x/2 - 50, 20))
+
+        self.scr.blit(player2_score,
+                      (SCR_SIZE.x/2+13, 20))
 
     def update(self):
         self.draw_bg()
