@@ -6,16 +6,14 @@ import copy
 
 
 class BallBase(Actor):
-    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), start_vel=None):
-        super().__init__(level=level,  # sprite_path='../Assets/ball.png',
-                         size=vec2(1, 1), vel=vel, pos=pos)
+    def __init__(self, level: Level, pos: vec2, start_vel):
+        super().__init__(level=level, size=vec2(1, 1), pos=pos, vel=start_vel)
+        self.start_vel = start_vel
         self.goal_can_happen = True
         self.players_goals = [0, 0]
-
-        self.start_vel = start_vel if start_vel else vec2(2, 0)
         self.collider = RectCollider(vec2(1, 1), pos)
         self.prev = self.collider
-        self.reflections = 1
+        self.reflections = 0
 
     def reflect(self):
         vh = ut.sign(self.pos.y)  # vertical half
@@ -31,7 +29,7 @@ class BallBase(Actor):
     def reset(self, side):
         self.pos = vec2(0, 0)
         self.vel = side * self.start_vel
-        self.reflections = 1
+        self.reflections = 0
 
     def check_goal(self):
         side = ut.sign(self.pos.x)

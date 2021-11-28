@@ -41,12 +41,11 @@ class RackBase(Actor):
         height = (int_p - self.pos).y  # will define reflected angle... someday
 
         v = self.ball.vel.magnitude()
-        v += 1 / self.ball.reflections
+        v += 1 / (1 + self.ball.reflections)
         a = height / self.size.y * math.pi / 2
 
-        # self.ball.vel = v * vec2(math.cos(a), math.sin(a))
-        # self.ball.vel.x *= -self.side
-        self.ball.vel.x *= -1
+        self.ball.vel = v * vec2(math.cos(a), math.sin(a))
+        self.ball.vel.x *= -self.side
         self.ball.pos.x += delta.x * 0
         self.ball.reflections += 1
 
