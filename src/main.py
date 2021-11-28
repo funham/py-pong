@@ -36,12 +36,12 @@ visual_group = pg.sprite.Group()
 background = BackGround(scr, ball.players_goals)
 particle_sys = ParticleSystem(scr, ball)
 
-ball.particle_system = particle_sys 
+ball.particle_system = particle_sys
+ball.back_ground = background
 
 visual_group.add(background)
 visual_group.add(particle_sys)
 
-bg_brightness = cfg.BG_DEFAULT_BRIGHTNESS  # 0 - 255
 rt = 0  # run time value
 
 while True:
@@ -58,7 +58,6 @@ while True:
 
 
     # setting background color
-    scr.fill(bg_brightness * pg.Vector3(1, 1, 1))
 
     # updating all sprite groups
     #visual_group.update(dt)

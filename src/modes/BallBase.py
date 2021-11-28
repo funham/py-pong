@@ -16,6 +16,7 @@ class BallBase(Actor):
         self.goal_can_happen = True
         self.players_goals = [0, 0]
         self.particle_system = None #for calling particles
+        self.back_ground = None
 
         self.start_vel = start_vel if start_vel else vec2(2, 0)
         self.collider = RectCollider(vec2(1, 1), pos)
@@ -34,15 +35,17 @@ class BallBase(Actor):
             self.pos.y += 2 * db
             self.vel.y *= -1
             for i in range(5):
-                self.particle_system.wall_boom(side, 4)
+                self.particle_system.vertical_boom(side, 4)
 
     def check_goal(self):
         self.side = ut.sign(self.pos.x)
         if self.goal_can_happen and abs(self.pos.x) >= self.level.field.x:
             self.players_goals[-(self.side - 1) // 2] += 1
             for i in range(10): #number of particles
-                self.particle_system.goal_boom(self.side, 7)
+                self.particle_system.horizontal_boom(self.side, 7)
             self.ball_stopped[0] = 1
+            self.particle_system.trail_can_work = False
+            self.back_ground.bg_brightness = 0
 
             self.goal_can_happen = False
 
@@ -59,6 +62,7 @@ class BallBase(Actor):
         if self.ball_stopped[0] and not self.ball_stopped[1]:
             if pg.time.get_ticks() - self.ball_stopped[2] > milisec:
                 self.vel = sd * self.start_vel
+                self.particle_system.trail_can_work = True
                 self.ball_stopped[0], self.ball_stopped[1]  = False, True
         
 
