@@ -14,6 +14,7 @@ class BallBase(Actor):
         self.collider = RectCollider(vec2(1, 1), pos)
         self.prev = self.collider
         self.reflections = 0
+        self.racks = None
 
     def reflect(self):
         vh = ut.sign(self.pos.y)  # vertical half
@@ -30,6 +31,7 @@ class BallBase(Actor):
         self.pos = vec2(0, 0)
         self.vel = side * self.start_vel
         self.reflections = 0
+
 
     def check_goal(self):
         side = ut.sign(self.pos.x)

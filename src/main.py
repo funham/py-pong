@@ -27,6 +27,7 @@ rack1 = RackClassic(level=lvl, pos=vec2(lvl.field.x - 2, 0),
 rack2 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
                       ball=ball, max_vel=3, difficulty=1)
 
+ball.racks = [rack1, rack2]
 
 rack_group.add(rack1)
 rack_group.add(rack2)
@@ -54,8 +55,9 @@ while True:
     scr.fill(bg_brightness * pg.Vector3(1, 1, 1))
 
     # updating all sprite groups
-    ball_group.update(dt, UPD.PRE)
     rack_group.update(dt, UPD.PRE)
+    ball_group.update(dt, UPD.PRE)
+    
 
     ball_group.update(dt, UPD.POST)
     rack_group.update(dt, UPD.POST)

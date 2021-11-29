@@ -20,7 +20,6 @@ class RackBase(Actor):
         self.coll = False
 
     # for some modes could be useful
-    # should be added after apply_phys()
     def constrain(self):
         bounds = self.level.field
 
@@ -36,33 +35,29 @@ class RackBase(Actor):
         '''
         takes the point ball hit racket in (intersection point)
         '''
-        # delta with current ball position and hit point
-        delta = vec2(self.ball.pos - int_p)
-        height = (int_p - self.pos).y  # will define reflected angle... someday
-
+        height = (int_p - self.pos).y  # finally defines reflection angle!
         v = self.ball.vel.magnitude()
         v += 1 / (1 + self.ball.reflections)
         a = height / self.size.y * math.pi / 2
 
-        self.ball.vel = v * vec2(math.cos(a), math.sin(a))
+        self.ball.vel = v * vec2(math.cos(a),
+                                 math.sin(a))
         self.ball.vel.x *= -self.side
-        self.ball.pos.x += delta.x * 0
         self.ball.reflections += 1
 
-    def collides_ball(self):
-        curr_bsurf = self.ball.collider.left_seg(inv=-self.side)
-        prev_bsurf = self.ball.prev
+    def collides_ball(self, dt):
+        surf = self.collider.left_seg(inv=self.side)
+        cball = self.ball.collider.left_seg(inv=-self.side)
+        nball = cball + self.ball.vel * dt
 
         # traces of top and bottom of ball surf
-        top_trace = SegCollider(prev_bsurf.top(),
-                                curr_bsurf.top())
-        btm_trace = SegCollider(prev_bsurf.bottom(),
-                                curr_bsurf.bottom())
+        top_trace = SegCollider(cball.top(),
+                                nball.top())
+        btm_trace = SegCollider(cball.bottom(),
+                                nball.bottom())
 
-        hit_surf = self.collider.left_seg(inv=self.side)
-
-        inter_top = top_trace.inter_seg(hit_surf)
-        inter_btm = btm_trace.inter_seg(hit_surf)
+        inter_top = top_trace.inter_seg(surf)
+        inter_btm = btm_trace.inter_seg(surf)
 
         if inter_top == None and inter_btm == None:
             return None
@@ -76,7 +71,7 @@ class RackBase(Actor):
         return (inter_top + inter_btm) / 2
 
     def pre_phys(self, dt):
-        ball_hit = self.collides_ball()
+        ball_hit = self.collides_ball(dt)
         if ball_hit and not self.coll:
             self.reflect_ball(ball_hit)
             self.coll = True
