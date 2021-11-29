@@ -3,11 +3,11 @@ from core.core import *
 from core.Colliders import *
 from . import utils as ut
 import copy
-
+import random
 
 class BallBase(Actor):
-    def __init__(self, level: Level, pos: vec2, start_vel):
-        super().__init__(level=level, size=vec2(1, 1), pos=pos, vel=start_vel)
+    def __init__(self, level: Level, pos: vec2, start_vel:int):
+        super().__init__(level=level, size=vec2(1, 1), pos=pos)
         # cool down and particles
         self.ball_stopped = [False, True, 0, self.vel] #super list, that contains all you need for timer
         self.ball_stopped[3] = self.vel
@@ -23,6 +23,12 @@ class BallBase(Actor):
         self.collider = RectCollider(vec2(1, 1), pos)
         self.prev = self.collider
         self.reflections = 0
+
+        self.launch()
+
+    def launch(self):
+        a = (random.random() * 2 - 1)
+        self.vel = self.start_vel * vec2(math.cos(a), math.sin(a))
 
     def reflect(self):
         side = ut.sign(self.pos.y)
@@ -63,9 +69,9 @@ class BallBase(Actor):
 
         if self.ball_stopped[0] and not self.ball_stopped[1]:
             if pg.time.get_ticks() - self.ball_stopped[2] > milisec:
-                self.vel = sd * self.start_vel
                 self.particle_system.trail_can_work = True
                 self.ball_stopped[0], self.ball_stopped[1]  = False, True
+                self.launch()
 
     def pre_phys(self, dt):
         self.prev = copy.copy(self.collider)

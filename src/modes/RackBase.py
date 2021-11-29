@@ -38,7 +38,7 @@ class RackBase(Actor):
         height = (int_p - self.pos).y  # finally defines reflection angle!
         v = self.ball.vel.magnitude()
         v += 1 / (1 + self.ball.reflections)
-        a = height / self.size.y * math.pi / 2
+        a = height / self.size.y * math.pi * 0.7
 
         for _ in range(5):
             self.ball.particle_system.horizontal_boom(self.side, 4)
@@ -101,7 +101,7 @@ class RackBase(Actor):
 
 
 class RackBaseAI(RackBase):
-    def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty):
+    def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty=1.0):
         super().__init__(level, pos, ball, max_vel)
         self.difficulty = difficulty
 
@@ -110,7 +110,7 @@ class RackBaseAI(RackBase):
 
         t_vel = 0
 
-        if abs(dy) > 2 / self.difficulty:
+        if abs(dy) > 1 / self.difficulty:
             if abs(dy) > self.size.y / 2:
                 t_vel = self.max_vel * ut.sign(dy)
             else:

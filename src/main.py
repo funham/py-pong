@@ -20,13 +20,13 @@ clock = pg.time.Clock()
 ball_group = pg.sprite.Group()
 rack_group = pg.sprite.Group()
 
-ball = BallClassic(lvl, pos=vec2(0, 0), start_vel=vec2(2, 0))
+ball = BallClassic(lvl, pos=vec2(0, 0), start_vel=2)
 ball_group.add(ball)
 
-rack1 = RackClassic(level=lvl, pos=vec2(lvl.field.x - 2, 0),
-                    ball=ball, max_vel=4)
+rack1 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
+                    ball=ball, max_vel=5)
 rack2 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
-                      ball=ball, max_vel=3, difficulty=1)
+                      ball=ball, max_vel=5)
 
 ball.racks = [rack1, rack2]
 
