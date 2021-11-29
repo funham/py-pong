@@ -10,9 +10,18 @@ class BackGround(pg.sprite.Sprite):
         super().__init__()
         self.scr = scr
         self.bg_brightness = cfg.BG_DEFAULT_BRIGHTNESS  # 0 - 255
-
+        
         self.players_scores = players_goals
-        self.font = pg.font.Font(None, 50)
+        self.path = "../Assets/Fonts/PixelPowerline.ttf"
+
+        self.win = True
+
+    def draw_hint(self):
+        hint_font = pg.font.Font(self.path, 30)
+
+        hint = hint_font.render("press 'R' to start", False, pg.Color("gray50"))
+        hint_rect = hint.get_rect(center = (cfg.SCR_SIZE.x/2-7,cfg.SCR_SIZE.y/4))
+        self.scr.blit(hint, hint_rect)
 
     def draw_bg(self):
         pg.draw.rect(self.scr, pg.Color("white"),(cfg.SCR_SIZE.x/2-10, cfg.SCR_SIZE.y/2-10, 20, 20), 2)
@@ -29,20 +38,54 @@ class BackGround(pg.sprite.Sprite):
             dot = dot + 20
 
     def draw_score(self):
-        player1_score = self.font.render(str(self.players_scores[0]), False, pg.Color("white"))
-        player2_score = self.font.render(str(self.players_scores[1]), False, pg.Color("white"))
-        self.scr.blit(player1_score, (SCR_SIZE.x/2 -
-                                      30 if self.players_scores[0] < 10 else SCR_SIZE.x/2 - 50, 20))
-        self.scr.blit(player2_score, (SCR_SIZE.x/2+13, 20))
+        self.font = pg.font.Font(self.path, 510)
 
-    def back_ground_filler(self):
+        player1_score = self.font.render(str(self.players_scores[0]), False, pg.Color("gray15"))
+        plrect1 = player1_score.get_rect(center = (cfg.SCR_SIZE.x/4,cfg.SCR_SIZE.y/2))
+
+        player2_score = self.font.render(str(self.players_scores[1]), False, pg.Color("gray15"))
+        plrect2 = player2_score.get_rect(center = (cfg.SCR_SIZE.x/4*3,cfg.SCR_SIZE.y/2))
+        
+        self.scr.blit(player1_score, plrect1)
+        self.scr.blit(player2_score, plrect2)
+
+    def score_checker(self):
+        if   self.players_scores[0] >= 10:
+            self.font = pg.font.Font(self.path, 200)
+            self.win = True
+
+            player1_score = self.font.render("win", False, pg.Color("gray25"))
+            plrect1 = player1_score.get_rect(center = (cfg.SCR_SIZE.x/4,cfg.SCR_SIZE.y/2))
+            self.scr.blit(player1_score, plrect1)
+
+            player2_score = self.font.render(str(self.players_scores[1]), False, pg.Color("gray25"))
+            plrect2 = player2_score.get_rect(center = (cfg.SCR_SIZE.x/4*3,cfg.SCR_SIZE.y/2))
+            self.scr.blit(player2_score, plrect2)
+
+        elif self.players_scores[1] >= 10:
+            self.font = pg.font.Font(self.path, 200)
+            self.win = True
+            player2_score = self.font.render("win", False, pg.Color("gray25"))
+            plrect2 = player2_score.get_rect(center = (cfg.SCR_SIZE.x/4*3,cfg.SCR_SIZE.y/2))
+            self.scr.blit(player2_score, plrect2)
+
+            player1_score = self.font.render(str(self.players_scores[0]), False, pg.Color("gray25"))
+            plrect1 = player1_score.get_rect(center = (cfg.SCR_SIZE.x/4,cfg.SCR_SIZE.y/2))
+            self.scr.blit(player1_score, plrect1)
+
+
+    def background_filler(self):
         self.bg_brightness = ut.approach(self.bg_brightness, 30, 0.5)
         self.scr.fill(self.bg_brightness * pg.Vector3(1, 1, 1))
 
     def update(self):
-        self.back_ground_filler()
+        self.background_filler()
+        self.score_checker()
+        if not self.win:
+            self.draw_score()
+        if self.win:
+            self.draw_hint()
         self.draw_bg()
-        self.draw_score()
 
 class ParticleSystem(pg.sprite.Sprite):
 
@@ -59,7 +102,7 @@ class ParticleSystem(pg.sprite.Sprite):
 
         self.ball = ball.rect
         self.particles = []
-        self.trail_can_work = True
+        self.trail_can_work = False
 
         pg.sprite.Sprite.__init__(self)
 

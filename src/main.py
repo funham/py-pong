@@ -23,9 +23,9 @@ rack_group = pg.sprite.Group()
 ball = BallClassic(lvl, pos=vec2(0, 0), start_vel=2)
 ball_group.add(ball)
 
-rack1 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
+rack1 = RackClassic(level=lvl, pos=vec2(lvl.field.x - 2, 0),
                     ball=ball, max_vel=5)
-rack2 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
+rack2 = RackClassic(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
                       ball=ball, max_vel=5)
 
 ball.racks = [rack1, rack2]
@@ -58,9 +58,15 @@ while True:
             pg.quit()
             sys.exit()
 
+        key_pressed = pg.key.get_pressed()
+        if key_pressed[pg.K_ESCAPE]:
+            pg.quit()
+            sys.exit()
+
 
     # updating all sprite groups
     visual_group.update()
+    
     rack_group.update(dt, UPD.PRE)
     ball_group.update(dt, UPD.PRE)
     
