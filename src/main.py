@@ -4,6 +4,7 @@ from core.core import *
 from modes.RackBase import *
 from modes.MClassic import *
 from modes.VisualEnvironment import *
+from modes.AudioManager import *
 
 import core.cfg as cfg
 from modes.utils import sign

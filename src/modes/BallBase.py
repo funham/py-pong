@@ -2,6 +2,7 @@ from core.cfg import SCR_SIZE
 from core.core import *
 from core.Colliders import *
 from . import utils as ut
+from .AudioManager import *
 import copy
 import random
 
@@ -11,8 +12,10 @@ class BallBase(Actor):
         # cool down and particles
         self.ball_stopped = [True, True, 0, self.vel] #super list, that contains all you need for timer
         self.ball_stopped[3] = self.vel
+
         self.particle_system = None #for calling particles
         self.back_ground = None
+        self.audio = Audio()
         
         # goals
         self.goal_can_happen = True
@@ -39,6 +42,7 @@ class BallBase(Actor):
             self.vel.y *= -1
             for i in range(5):
                 self.particle_system.vertical_boom(side, 4)
+            self.audio.play("boom")
                 
     def check_goal(self):
         self.side = ut.sign(self.pos.x)
@@ -46,6 +50,7 @@ class BallBase(Actor):
             self.players_goals[-(self.side - 1) // 2] += 1
             for _ in range(10): #number of particles
                 self.particle_system.horizontal_boom(self.side, 7)
+            self.audio.play("goal_boom")
             self.time_side = self.side
             self.ball_stopped[0] = 1
             self.reflections = 0

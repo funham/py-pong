@@ -3,6 +3,7 @@ from pygame import key
 from .BallBase import *
 from .import utils as ut
 import matplotlib.pyplot as plt
+from .AudioManager import *
 
 import copy
 
@@ -18,6 +19,8 @@ class RackBase(Actor):
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)
         self.coll = False
+
+        self.audio = Audio()
 
     # for some modes could be useful
     def constrain(self):
@@ -42,6 +45,7 @@ class RackBase(Actor):
 
         for _ in range(5):
             self.ball.particle_system.horizontal_boom(self.side, 4)
+        self.audio.play("boom")
         self.ball.vel = v * vec2(math.cos(a),
                                  math.sin(a))
         self.ball.vel.x *= -self.side
