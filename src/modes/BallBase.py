@@ -6,22 +6,23 @@ import copy
 
 
 class BallBase(Actor):
-    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), start_vel=None):
-        super().__init__(level=level,  # sprite_path='../Assets/ball.png',
-                         size=vec2(1, 1), vel=vel, pos=pos)
-
-        self.ball_stopped = [False, True, 0, vel] #super list, that contains all you need for timer
+    def __init__(self, level: Level, pos: vec2, start_vel):
+        super().__init__(level=level, size=vec2(1, 1), pos=pos, vel=start_vel)
+        # cool down and particles
+        self.ball_stopped = [False, True, 0, self.vel] #super list, that contains all you need for timer
         self.ball_stopped[3] = self.vel
-        
-        self.goal_can_happen = True
-        self.players_goals = [0, 0]
         self.particle_system = None #for calling particles
         self.back_ground = None
-
-        self.start_vel = start_vel if start_vel else vec2(2, 0)
+        
+        # goals
+        self.goal_can_happen = True
+        self.players_goals = [0, 0]
+        
+        # initialization
+        self.start_vel = start_vel
         self.collider = RectCollider(vec2(1, 1), pos)
         self.prev = self.collider
-        self.reflections = 1
+        self.reflections = 0
 
     def reflect(self):
         side = ut.sign(self.pos.y)
@@ -36,6 +37,11 @@ class BallBase(Actor):
             self.vel.y *= -1
             for i in range(5):
                 self.particle_system.vertical_boom(side, 4)
+
+    def reset(self, side):
+        self.pos = vec2(0, 0)
+        self.vel = side * self.start_vel
+        self.reflections = 0
 
     def check_goal(self):
         self.side = ut.sign(self.pos.x)
@@ -64,8 +70,6 @@ class BallBase(Actor):
                 self.vel = sd * self.start_vel
                 self.particle_system.trail_can_work = True
                 self.ball_stopped[0], self.ball_stopped[1]  = False, True
-        
-
 
     def pre_phys(self, dt):
         self.prev = copy.copy(self.collider)

@@ -21,6 +21,7 @@ class BackGround(pg.sprite.Sprite):
         for i in range(10):
             pg.draw.line(self.scr, pg.Color("white"), (cfg.SCR_SIZE.x / 2-1, dot), (cfg.SCR_SIZE.x/2-1, dot+10), 2)
             dot = dot + 20
+
         dot += 10
 
         for i in range(10):

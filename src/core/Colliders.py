@@ -21,6 +21,14 @@ class SegCollider(Collider):
         self.min_x = min(p1.x, p2.x)
         self.max_x = max(p1.x, p2.x)
 
+    # parallel shift
+    def __add__(self, vec : vec2):
+        p1 = self.p1 + vec
+        p2 = self.p2 + vec
+
+        return SegCollider(p1, p2)
+
+    
     def top(self):
         return self.p1 if self.p1.y < self.p2.y else self.p2
 

@@ -24,5 +24,5 @@ class RackClassicAI(RackBaseAI):
 
 
 class BallClassic(BallBase):
-    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0), start_vel=vec2(2, 0)):
-        super().__init__(level, pos, vel=vel, start_vel=vec2(2, 0))
+    def __init__(self, level: Level, pos: vec2, start_vel=vec2(2, 0)):
+        super().__init__(level=level, pos=pos, start_vel=start_vel)
