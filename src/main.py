@@ -24,7 +24,7 @@ ball = BallClassic(lvl, pos=vec2(0, 0), start_vel=2)
 ball_group.add(ball)
 
 rack1 = RackClassicAI(level=lvl, pos=vec2(lvl.field.x - 2, 0),
-                    ball=ball, max_vel=5)
+                      ball=ball, max_vel=5)
 rack2 = RackClassicAI(level=lvl, pos=vec2(-lvl.field.x + 2, 0),
                       ball=ball, max_vel=5)
 
@@ -58,12 +58,10 @@ while True:
             pg.quit()
             sys.exit()
 
-
     # updating all sprite groups
     visual_group.update()
     rack_group.update(dt, UPD.PRE)
     ball_group.update(dt, UPD.PRE)
-    
 
     ball_group.update(dt, UPD.POST)
     rack_group.update(dt, UPD.POST)
@@ -71,6 +69,6 @@ while True:
     # drawing all sprite groups
     ball_group.draw(scr)
     rack_group.draw(scr)
-    
+
     # putting image on the screen
     pg.display.update()
