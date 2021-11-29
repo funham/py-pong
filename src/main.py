@@ -59,15 +59,8 @@ while True:
             sys.exit()
 
 
-    # setting background color
-
     # updating all sprite groups
-<<<<<<< HEAD
-    #visual_group.update(dt)
     visual_group.update()
-    ball_group.update(dt, UPD.PRE)
-=======
->>>>>>> Colliders
     rack_group.update(dt, UPD.PRE)
     ball_group.update(dt, UPD.PRE)
     
