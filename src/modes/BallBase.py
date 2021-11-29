@@ -37,19 +37,15 @@ class BallBase(Actor):
             self.vel.y *= -1
             for i in range(5):
                 self.particle_system.vertical_boom(side, 4)
-
-    def reset(self, side):
-        self.pos = vec2(0, 0)
-        self.vel = side * self.start_vel
-        self.reflections = 0
-
+                
     def check_goal(self):
         self.side = ut.sign(self.pos.x)
         if self.goal_can_happen and abs(self.pos.x) >= self.level.field.x:
             self.players_goals[-(self.side - 1) // 2] += 1
-            for i in range(10): #number of particles
+            for _ in range(10): #number of particles
                 self.particle_system.horizontal_boom(self.side, 7)
             self.ball_stopped[0] = 1
+            self.reflections = 0
             self.particle_system.trail_can_work = False
             self.back_ground.bg_brightness = 0
 
