@@ -1,8 +1,10 @@
+from modes.VisualEnvironment import Quake
 import pygame
 from pygame import key
 from .BallBase import *
 from .import utils as ut
 import matplotlib.pyplot as plt
+from .AudioManager import *
 
 import copy
 
@@ -18,6 +20,8 @@ class RackBase(Actor):
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)
         self.coll = False
+
+        self.audio = Audio()
 
     # for some modes could be useful
     def constrain(self):
@@ -42,6 +46,8 @@ class RackBase(Actor):
 
         for _ in range(5):
             self.ball.particle_system.horizontal_boom(self.side, 4)
+        self.audio.play("boom")
+        Quake.start(v * 0.5)
         self.ball.vel = v * vec2(math.cos(a),
                                  math.sin(a))
         self.ball.vel.x *= -self.side
@@ -106,15 +112,24 @@ class RackBaseAI(RackBase):
         self.difficulty = difficulty
 
     def follow_ball(self, dt):
-        dy = (self.ball.pos - self.pos).y
+        if ut.sign(self.ball.vel.x) != self.side:
+            # stick center
+            dy = abs(self.pos.y)
+            self.vel.y = ut.approach(
+                self.vel.y,
+                2 * -ut.sign(self.pos.y) if dy > 0.5 else 0,
+                dt
+            )
+        else:
+            # follow ball
+            dy = (self.ball.pos - self.pos).y
 
-        t_vel = 0
+            t_vel = 0
 
-        if abs(dy) > 1 / self.difficulty:
-            if abs(dy) > self.size.y / 2:
-                t_vel = self.max_vel * ut.sign(dy)
-            else:
-                t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+            if abs(dy) > 1 / self.difficulty:
+                if abs(dy) > self.size.y / 2:
+                    t_vel = self.max_vel * ut.sign(dy)
+                else:
+                    t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
 
-        t_vel *= self.difficulty
-        self.vel.y = ut.approach(self.vel.y, t_vel, dt * self.max_vel)
+            self.vel.y = ut.approach(self.vel.y, t_vel, dt * self.max_vel * self.difficulty)
