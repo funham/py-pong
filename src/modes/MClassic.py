@@ -15,8 +15,8 @@ class RackClassic(RackBase):
 
 
 class RackClassicAI(RackBaseAI):
-    def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float):
-        super().__init__(level, pos, ball, max_vel)
+    def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty:float):
+        super().__init__(level, pos, ball, max_vel, difficulty=difficulty)
 
     def pre_phys(self, dt):
         self.follow_ball(dt)

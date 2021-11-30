@@ -1,3 +1,4 @@
+from modes.VisualEnvironment import Quake
 from core.cfg import SCR_SIZE
 from core.core import *
 from core.Colliders import *
@@ -5,6 +6,7 @@ from . import utils as ut
 from .AudioManager import *
 import copy
 import random
+
 
 class BallBase(Actor):
     def __init__(self, level: Level, pos: vec2, start_vel:int):
@@ -51,6 +53,9 @@ class BallBase(Actor):
             for _ in range(10): #number of particles
                 self.particle_system.horizontal_boom(self.side, 7)
             self.audio.play("goal_boom")
+
+            Quake.start(7, 2, 0.2)
+            
             self.time_side = self.side
             self.ball_stopped[0] = 1
             self.reflections = 0
