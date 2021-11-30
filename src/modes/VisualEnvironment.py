@@ -1,9 +1,8 @@
 import pygame as pg
 from pygame.constants import BLEND_RGBA_ADD
 from core.core import *
-from modes.BallBase import *
 import random
-
+from . import utils as ut
 
 class BackGround(pg.sprite.Sprite):
     def __init__(self, scr, players_goals):
@@ -179,6 +178,38 @@ class ParticleSystem(pg.sprite.Sprite):
         if self.trail_can_work:
             self.ball_trail(3, 0.2) 
         self.particle_updater()
+
+class Quake:
+    def __init__():
+        Quake.t = -1
+        Quake.active = False
+
+    def start(intensity, duration = 1, freq_div = 1):
+        Quake.active = True
+        Quake.t = -1
+        Quake.intensity = intensity
+        Quake.duration = duration
+        Quake.freq = freq_div
+
+    def stop():
+        Quake.active = False
+        lvl.origin = cfg.SCR_CENTER
+
+    def update(dt):
+        if not Quake.active:
+            return
+
+        if Quake.t > 1:
+            Quake.stop()
+            return
+
+        Quake.t += dt / Quake.duration
+        lvl.origin = cfg.SCR_CENTER + Quake.intensity * \
+            (math.exp(-(Quake.t / Quake.duration)**2)) * vec2(
+            math.sin(50 * Quake.t * Quake.freq),
+            math.cos(20 * Quake.t * Quake.freq)
+        )
+
 
         
 
