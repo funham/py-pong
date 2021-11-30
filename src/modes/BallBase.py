@@ -40,7 +40,7 @@ class BallBase(Actor):
         if ut.sign(db) == -vh:
             self.pos.y += 2 * db
             self.vel.y *= -1
-            for i in range(5):
+            for _ in range(5):
                 self.particle_system.vertical_boom(side, 4)
             self.audio.play("boom")
                 
@@ -83,6 +83,7 @@ class BallBase(Actor):
 
             if key_pressed[pg.K_r]:
                 self.back_ground.win = False
+                self.back_ground.game_start = False
                 self.players_goals[0],self.players_goals[1] = 0, 0
 
     def pre_phys(self, dt):

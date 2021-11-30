@@ -14,7 +14,26 @@ class BackGround(pg.sprite.Sprite):
         self.players_scores = players_goals
         self.path = "../Assets/Fonts/PixelPowerline.ttf"
 
+        self.game_start = True
         self.win = True
+
+        self.logo_init()
+
+    def logo_init(self):
+        self.fox_logo_path = "../Assets/Gray.png"
+        self.fox_logo = pg.image.load(self.fox_logo_path).convert_alpha()
+        self.fox_logo = pg.transform.scale(self.fox_logo, (self.fox_logo.get_width()/6, self.fox_logo.get_height()/6))
+        self.fox_logo_rect =  self.fox_logo.get_rect(center = (cfg.SCR_SIZE.x/4,cfg.SCR_SIZE.y/2))
+
+        self.exinus_logo_path = "../Assets/Exinus.png"
+        self.exinus_logo = pg.image.load(self.exinus_logo_path).convert_alpha()
+        self.exinus_logo = pg.transform.scale(self.exinus_logo, (self.exinus_logo.get_width()/5, self.exinus_logo.get_height()/5))
+        self.exinus_logo_rect =  self.exinus_logo.get_rect(center = (cfg.SCR_SIZE.x/4*3,cfg.SCR_SIZE.y/2))
+
+
+    def draw_logos(self):
+        self.scr.blit(self.fox_logo, self.fox_logo_rect)
+        self.scr.blit(self.exinus_logo, self.exinus_logo_rect)
 
     def draw_hint(self):
         hint_font = pg.font.Font(self.path, 30)
@@ -81,10 +100,9 @@ class BackGround(pg.sprite.Sprite):
     def update(self):
         self.background_filler()
         self.score_checker()
-        if not self.win:
-            self.draw_score()
-        if self.win:
-            self.draw_hint()
+        if not self.win: self.draw_score()
+        if self.win: self.draw_hint()
+        if self.game_start: self.draw_logos()
         self.draw_bg()
 
 class ParticleSystem(pg.sprite.Sprite):
