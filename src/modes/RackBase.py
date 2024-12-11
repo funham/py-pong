@@ -1,5 +1,10 @@
+from modes.VisualEnvironment import Quake
+import pygame
+from pygame import key
 from .BallBase import *
 from .import utils as ut
+import matplotlib.pyplot as plt
+from .AudioManager import *
 
 import copy
 
@@ -9,87 +14,122 @@ import copy
 class RackBase(Actor):
     def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float):
         super().__init__(level=level,  # sprite_path='../Assets/rack.png',
-                         size=vec2(1, 5), vel=vec2(0, 0), pos=pos)
+                         size=vec2(1, 5), vel=vec2(0, 0), pos=pos,
+                         collider=RectCollider(size=vec2(1, 5), pos=pos))
         self.ball = ball
         self.max_vel = max_vel
         self.side = ut.sign(self.pos.x)
         self.coll = False
 
+        self.audio = Audio()
+
     # for some modes could be useful
-    # should be added after apply_phys()
-    def check_bounds(self):
-
+    def constrain(self):
         bounds = self.level.field
-
-        # TODO cut the crap
-        if self.pos.x - self.size.x / 2 <= -bounds.x:
-            self.pos.x = -bounds.x + self.size.x / 2
 
         if self.pos.y - self.size.y / 2 <= -bounds.y:
             self.pos.y = -bounds.y + self.size.y / 2
-
-        if self.pos.x + self.size.x / 2 >= bounds.x:
-            self.pos.x = bounds.x - self.size.x / 2
+            self.vel.y = 0
 
         if self.pos.y + self.size.y / 2 >= bounds.y:
             self.pos.y = bounds.y - self.size.y / 2
+            self.vel.y = 0
 
-    def reflect_ball(self, dt):
+    def reflect_ball(self, int_p):
+        '''
+        takes the point ball hit racket in (intersection point)
+        '''
+        height = (int_p - self.pos).y  # finally defines reflection angle!
+        v = self.ball.vel.magnitude()
+        v += 1 / (1 + self.ball.reflections)
+        a = height / self.size.y * math.pi * 0.7
 
-        def cb(obj, sign) -> vec2: return obj.pos + sign * obj.size / 2
+        for _ in range(5):
+            self.ball.particle_system.horizontal_boom(self.side, 4)
+        self.audio.play("boom")
+        Quake.start(v * 0.5)
+        self.ball.vel = v * vec2(math.cos(a),
+                                 math.sin(a))
+        self.ball.vel.x *= -self.side
+        self.ball.reflections += 1
 
-        rb = cb(self, -self.side).x
-        bb = cb(self.ball, self.side).x
+    def collides_ball(self, dt):
+        surf = self.collider.left_seg(inv=self.side)
+        cball = self.ball.collider.left_seg(inv=-self.side)
+        nball = cball + self.ball.vel * dt
 
-        dx = bb - rb
+        # traces of top and bottom of ball surf
+        top_trace = SegCollider(cball.top(),
+                                nball.top())
+        btm_trace = SegCollider(cball.bottom(),
+                                nball.bottom())
 
-        self.ball.pos.x = self.ball.pos.x - 2 * dx
-        self.ball.vel.x *= -1
+        inter_top = top_trace.inter_seg(surf)
+        inter_btm = btm_trace.inter_seg(surf)
 
-        # print(
-        #     f'bb={bb}, rb={rb}, dx={dx}, s={-2*dx*self.side}')
-        # print(f'next bb={ self.ball.pos.x + self.side * self.ball.size.x / 2}')
+        if inter_top == None and inter_btm == None:
+            return None
 
-    def is_ball_behind(self):
+        if inter_top == None:
+            return inter_btm
 
-        # calculate border function
-        def cb(pos, size, sign) -> vec2: return pos + sign * size / 2
+        if inter_btm == None:
+            return inter_top
 
-        in_y = cb(self.ball.np, self.ball.size, 1).y <= cb(self.pos, self.size, 1).y and \
-            cb(self.ball.np, self.ball.size, -
-               1).y >= cb(self.pos, self.size, -1).y
+        return (inter_top + inter_btm) / 2
 
-        in_x = self.ball.np.x * self.side >= self.pos.x * self.side
-
-        # TODO check with correct trajectory
-        return in_x and in_y
-
-    # inherited sprite function
-    # called automatically before drawing
-    def update(self, dt) -> None:
-        if self.is_ball_behind() and not self.coll:
-            self.reflect_ball(dt)
+    def pre_phys(self, dt):
+        ball_hit = self.collides_ball(dt)
+        if ball_hit and not self.coll:
+            self.reflect_ball(ball_hit)
             self.coll = True
-
-        elif not self.is_ball_behind() and self.coll:
+        elif not ball_hit and self.coll:
             self.coll = False
 
-        super().apply_phys(dt)
+        return super().pre_phys(dt)
 
+    def post_phys(self, dt):
+        self.constrain()
+        return super().post_phys(dt)
+
+    def handle_input(self, dt):
+        key_pressed = pygame.key.get_pressed()
+
+        up = pygame.K_w if self.side < 0 else pygame.K_UP
+        dn = pygame.K_s if self.side < 0 else pygame.K_DOWN
+
+        dir = key_pressed[dn] - key_pressed[up]
+
+        self.vel.y = ut.approach(
+            self.vel.y, self.max_vel * dir, dt * self.max_vel)
 
 # Base class for all Racket AI classes
+
+
 class RackBaseAI(RackBase):
-    def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty):
+    def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty=1.0):
         super().__init__(level, pos, ball, max_vel)
         self.difficulty = difficulty
 
-    def follow_ball(self):
-        dy = (self.ball.pos - self.pos).y
-
-        if dy > self.size.y / 2:
-            self.vel.y = self.max_vel * ut.sign(dy)
+    def follow_ball(self, dt):
+        if ut.sign(self.ball.vel.x) != self.side:
+            # stick center
+            dy = abs(self.pos.y)
+            self.vel.y = ut.approach(
+                self.vel.y,
+                2 * -ut.sign(self.pos.y) if dy > 0.5 else 0,
+                dt
+            )
         else:
-            self.vel.y = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+            # follow ball
+            dy = (self.ball.pos - self.pos).y
 
-    def update(self, dt) -> None:
-        super().update(dt)  # applies physics as well
+            t_vel = 0
+
+            if abs(dy) > 1 / self.difficulty:
+                if abs(dy) > self.size.y / 2:
+                    t_vel = self.max_vel * ut.sign(dy)
+                else:
+                    t_vel = min(self.max_vel, abs(self.ball.vel.y)) * ut.sign(dy)
+
+            self.vel.y = ut.approach(self.vel.y, t_vel, dt * self.max_vel * self.difficulty)

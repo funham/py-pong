@@ -8,29 +8,21 @@ class RackClassic(RackBase):
     def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float):
         super().__init__(level, pos, ball, max_vel)
 
-    def update(self, dt) -> None:
-        # TODO add advanced reflections
-        if self.rect.colliderect(self.ball.rect):
-            self.ball.vel.x *= -1
+    def pre_phys(self, dt):
+        self.handle_input(dt)
 
-        super().update(dt)
-        super().check_bounds()
+        return super().pre_phys(dt)
 
 
 class RackClassicAI(RackBaseAI):
-    def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty):
+    def __init__(self, level: Level, pos: vec2, ball: BallBase, max_vel: float, difficulty:float):
         super().__init__(level, pos, ball, max_vel, difficulty=difficulty)
 
-    def update(self, dt) -> None:
-        super().follow_ball()
-        super().update(dt)
-        super().check_bounds()
+    def pre_phys(self, dt):
+        self.follow_ball(dt)
+        return super().pre_phys(dt)
 
 
 class BallClassic(BallBase):
-    def __init__(self, level: Level, pos: vec2, vel=vec2(0, 0)):
-        super().__init__(level, pos, vel=vel)
-
-    def update(self, dt) -> None:
-        super().update(dt)
-        super().reflect()
+    def __init__(self, level: Level, pos: vec2, start_vel):
+        super().__init__(level=level, pos=pos, start_vel=start_vel)
